@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 # coding: UTF-8
 
-__description__ = 'Tool to convert images to pdf and unite them.'
+__description__ = 'Binary editer'
 __author__ = '@tkmru'
 __version__ = '0.1'
 __date__ = '2015/x/x'

@@ -4,6 +4,7 @@
 from setuptools import setup
 import os
 import shutil
+import biwx
 
 if not os.path.exists('scripts'):
     os.makedirs('scripts')
@@ -14,14 +15,14 @@ with open('README.rst', 'r') as f:
 
 setup(
     name = 'biwx',
-    version = '0.1',
-    author = '@tkmru',
+    version = biwx.__version__,
+    author = biwx.__author__,
     author_email = 'i.am.tkmru@gmail.com',
     scripts=['scripts/biwx'],
-    url = 'https://github.com/tkmru/im2pdf',
-    license = 'MIT License',
+    url = 'https://github.com/tkmru/biwx',
+    license = biwx.__license__,
     keywords = ['binary', 'hex'],
-    description = 'Binary editer',
+    description = biwx.__description__,
     long_description = readme_file,
     classifiers = [
         'Programming Language :: Python',
