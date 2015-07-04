@@ -12,8 +12,8 @@ __license__ = 'MIT License'
 import wx
 
 class MainWindow(wx.Frame):
-    def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(500, 500))
+    def __init__(self, *args, **kwargs):
+        wx.Frame.__init__(self, *args, **kwargs)
         self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
         self.CreateStatusBar() # A Statusbar in the bottom of the window
 
@@ -33,12 +33,12 @@ class MainWindow(wx.Frame):
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, "&File")
         self.SetMenuBar(menu_bar)  # Adding the MenuBar to the Frame content.
-        self.Show(True)
 
 
 if __name__ == '__main__':
     app = wx.App(False)
-    frame = MainWindow(None, 'biwx')
+    frame = MainWindow(None, title='biwx', size=(500, 500))
+    frame.Show()
     app.MainLoop()
 
 
