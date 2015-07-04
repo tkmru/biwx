@@ -20,13 +20,14 @@ class MainWindow(wx.Frame):
         # Setting up the menu.
         file_menu = wx.Menu()
 
+        # On OSX Cocoa both the about and the quit menu belong to the bold 'app menu'.
         file_menu.Append(wx.ID_ABOUT, '&About', 'Information about this program')
         file_menu.Append(wx.ID_PREFERENCES, "&Preferences")
-        file_menu.Append(wx.ID_EXIT,'&Exit', 'Terminate the program')
+        file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
 
-        file_menu.Append(-1, '&New File')
-        file_menu.Append(-1, '&Open')
-        file_menu.Append(-1, '&Save')
+        file_menu.Append(wx.ID_ANY, '&New File')
+        file_menu.Append(wx.ID_ANY, '&Open')
+        file_menu.Append(wx.ID_ANY, '&Save')
 
         # Creating the menubar.
         menu_bar = wx.MenuBar()
