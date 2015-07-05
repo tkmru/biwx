@@ -10,11 +10,12 @@ __copyright__ = 'Copyright (c) @tkmru'
 __license__ = 'MIT License'
 
 import wx
+import wx.grid
 
 class MainWindow(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
-        self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+
         self.CreateStatusBar() # A Statusbar in the bottom of the window
 
         # Setting up the menu.
@@ -33,6 +34,18 @@ class MainWindow(wx.Frame):
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, "&File")
         self.SetMenuBar(menu_bar)  # Adding the MenuBar to the Frame content.
+
+        self.panel = wx.Panel(self)
+ 
+        hex_grid = wx.grid.Grid(self.panel)
+        hex_grid.CreateGrid(10, 16)
+
+        hex_grid.ClipHorzGridLines(False)
+        hex_grid.ClipVertGridLines(False)
+ 
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(hex_grid, 1, wx.EXPAND)
+        self.panel.SetSizer(sizer)
 
 
 if __name__ == '__main__':
