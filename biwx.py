@@ -13,20 +13,43 @@ import wx
 import wx.grid
 
 
+class HexGridTable(wx.grid.PyGridTableBase):
+
+    def __init__(self, *args, **kwags):
+        wx.grid.PyGridTableBase.__init__(self)
+
+        self.cols_labels = ["%X" % i for i in range(16)] + ["        Dump       "]
+
+    def GetNumberRows(self):
+        return 10
+
+    def GetNumberCols(self):
+        return 17
+
+    def GetColLabelValue(self, col):
+        return self.cols_labels[col]
+
+    def GetRowLabelValue(self, row):
+        return "0x%X " % (row * 16)
+
+
 class HexEditor(wx.Panel):
 
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
 
         hex_grid = wx.grid.Grid(self)
-        hex_grid.CreateGrid(10, 16)
+        table = HexGridTable()
 
-        hex_grid.ClipHorzGridLines(False)
+        hex_grid.ClipHorzGridLines(True)
         hex_grid.ClipVertGridLines(False)
+
+        hex_grid.SetTable(table, True)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(hex_grid, 1, wx.EXPAND)
         self.SetSizerAndFit(sizer)
+
 
 
 class MainWindow(wx.Frame):
@@ -52,7 +75,6 @@ class MainWindow(wx.Frame):
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, "&File")
         self.SetMenuBar(menu_bar)  # Adding the MenuBar to the Frame content.
-
 
         self.editor = HexEditor(self)
 
