@@ -39,17 +39,35 @@ class HexEditor(wx.Panel):
         wx.Panel.__init__(self, *args, **kwags)
 
         hex_grid = wx.grid.Grid(self)
-        table = HexGridTable()
+        self.table = HexGridTable()
+        hex_grid.SetTable(self.table)
 
-        hex_grid.ClipHorzGridLines(True)
-        hex_grid.ClipVertGridLines(False)
+        hex_grid.SetColSize(0, 30)
+        hex_grid.SetColSize(1, 30)
+        hex_grid.SetColSize(2, 30)
+        hex_grid.SetColSize(3, 30)
+        hex_grid.SetColSize(4, 30)
+        hex_grid.SetColSize(5, 30)
+        hex_grid.SetColSize(6, 30)
+        hex_grid.SetColSize(7, 30)
+        hex_grid.SetColSize(8, 30)
+        hex_grid.SetColSize(9, 30)
+        hex_grid.SetColSize(10, 30)
+        hex_grid.SetColSize(11, 30)
+        hex_grid.SetColSize(12, 30)
+        hex_grid.SetColSize(13, 30)
+        hex_grid.SetColSize(14, 30)
+        hex_grid.SetColSize(15, 30)
+        hex_grid.SetColSize(16, 200)
 
-        hex_grid.SetTable(table, True)
+        hex_grid.ClipHorzGridLines(True) # 効いてない
+        hex_grid.ClipVertGridLines(False) # 効いてない
+
+        hex_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(hex_grid, 1, wx.EXPAND)
         self.SetSizerAndFit(sizer)
-
 
 
 class MainWindow(wx.Frame):
@@ -86,5 +104,3 @@ if __name__ == '__main__':
     frame = MainWindow(None, title='biwx', size=(500, 500))
     frame.Show()
     app.MainLoop()
-
-
