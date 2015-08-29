@@ -19,10 +19,13 @@ class HexGridTable(wx.grid.PyGridTableBase):
         wx.grid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
-        self.binary_data = (('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))
+        self.binary_data = [['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
 
     def GetNumberRows(self):
-        return 10
+        if len(self.binary_data) > 10:
+            return len(self.binary_data)
+        else:
+            return 10
 
     def GetNumberCols(self):
         return 17
@@ -31,8 +34,8 @@ class HexGridTable(wx.grid.PyGridTableBase):
         return False
 
     def GetValue(self, row, col): # send SetValue
-        if col < len(self.binary_data) and row < len(self.binary_data[col]):
-            return self.binary_data[col][row]
+        if row < len(self.binary_data) and col < len(self.binary_data[row]):
+            return self.binary_data[row][col]
 
         else:
             return ''
