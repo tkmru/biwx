@@ -30,9 +30,12 @@ class HexGridTable(wx.grid.PyGridTableBase):
     def IsEmptyCell(self, row, col):
         return False
 
-    def GetValue(self, row, col):
-        value = self.binary_data[col][row]
-        return value
+    def GetValue(self, row, col): # send SetValue
+        if col < len(self.binary_data) and row < len(self.binary_data[col]):
+            return self.binary_data[col][row]
+
+        else:
+            return ''
 
     def SetValue(self, row, col, value):
         self.data[(row, col)] = value
