@@ -18,13 +18,24 @@ class HexGridTable(wx.grid.PyGridTableBase):
     def __init__(self, *args, **kwags):
         wx.grid.PyGridTableBase.__init__(self)
 
-        self.cols_labels = ["%X" % i for i in range(16)] + ["        Dump       "]
+        self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
+        self.binary_data = (('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))
 
     def GetNumberRows(self):
         return 10
 
     def GetNumberCols(self):
         return 17
+
+    def IsEmptyCell(self, row, col):
+        return False
+
+    def GetValue(self, row, col):
+        value = self.binary_data[col][row]
+        return value
+
+    def SetValue(self, row, col, value):
+        self.data[(row, col)] = value
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
