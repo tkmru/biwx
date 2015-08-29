@@ -60,9 +60,6 @@ class HexEditor(wx.Panel):
         hex_grid.SetColSize(15, 30)
         hex_grid.SetColSize(16, 200)
 
-        hex_grid.ClipHorzGridLines(True) # 効いてない
-        hex_grid.ClipVertGridLines(False) # 効いてない
-
         hex_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
