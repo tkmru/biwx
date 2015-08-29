@@ -99,9 +99,9 @@ class MainWindow(wx.Frame):
         file_menu.Append(wx.ID_PREFERENCES, "&Preferences")
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
 
-        file_menu.Append(wx.ID_ANY, '&New File')
-        file_menu.Append(wx.ID_ANY, '&Open')
-        file_menu.Append(wx.ID_ANY, '&Save')
+        file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
+        file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
+        file_menu.Append(wx.ID_SAVE, '&Save')
 
         # Creating the menubar.
         menu_bar = wx.MenuBar()
