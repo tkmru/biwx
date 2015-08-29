@@ -22,10 +22,10 @@ class HexGridTable(wx.grid.PyGridTableBase):
         self.binary_data = [['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
 
     def GetNumberRows(self):
-        if len(self.binary_data) > 10:
+        if len(self.binary_data) > 23:
             return len(self.binary_data)
         else:
-            return 10
+            return 23
 
     def GetNumberCols(self):
         return 17
@@ -108,13 +108,13 @@ class MainWindow(wx.Frame):
         menu_bar.Append(file_menu, "&File")
         self.SetMenuBar(menu_bar)  # Adding the MenuBar to the Frame content.
 
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = HexEditor(self)
-
-        self.Fit()
+        sizer.Add(self.editor, 1, wx.EXPAND)
 
 
 if __name__ == '__main__':
     app = wx.App(False)
-    frame = MainWindow(None, title='biwx', size=(500, 500))
+    frame = MainWindow(None, title='biwx', size=(780, 510))
     frame.Show()
     app.MainLoop()
