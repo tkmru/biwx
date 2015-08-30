@@ -19,7 +19,7 @@ class HexGridTable(wx.grid.PyGridTableBase):
         wx.grid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
-        self.binary_data = [['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
+        self.binary_data = [['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '', '', '', '', '', '', '']]
 
     def GetNumberRows(self):
         if len(self.binary_data) > 23:
@@ -33,21 +33,28 @@ class HexGridTable(wx.grid.PyGridTableBase):
     def IsEmptyCell(self, row, col):
         return False
 
-    def GetValue(self, row, col): # send SetValue
-        if row < len(self.binary_data) and col < len(self.binary_data[row]):
+    def GetValue(self, row, col): # get initial value
+        try:
             return self.binary_data[row][col]
 
-        else:
+        except IndexError:
             return ''
 
-    def SetValue(self, row, col, value):
-        self.data[(row, col)] = value
+    def SetValue(self, row, col, value): # change value
+        try:
+            self.binary_data[row][col] = value
+
+        except IndexError:
+            for i in range(row - len(self.binary_data) + 1):
+                self.binary_data.append(['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
+
+            self.binary_data[row][col] = value
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
 
     def GetRowLabelValue(self, row):
-        return "0x%X " % (row * 16)
+        return '0x{0:X}'.format(row * 16)
 
 
 class HexEditor(wx.Panel):
@@ -89,12 +96,12 @@ class MainWindow(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
 
-        self.CreateStatusBar() # A Statusbar in the bottom of the window
+        self.CreateStatusBar() # a Statusbar in the bottom of the window
 
-        # Setting up the menu.
+        # setting up the menu.
         file_menu = wx.Menu()
 
-        # On OSX Cocoa both the about and the quit menu belong to the bold 'app menu'.
+        # on OSX Cocoa both the about and the quit menu belong to the bold 'app menu'.
         file_menu.Append(wx.ID_ABOUT, '&About', 'Information about this program')
         file_menu.Append(wx.ID_PREFERENCES, "&Preferences")
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
@@ -103,10 +110,10 @@ class MainWindow(wx.Frame):
         file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
         file_menu.Append(wx.ID_SAVE, '&Save')
 
-        # Creating the menubar.
+        # creating the menubar.
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, "&File")
-        self.SetMenuBar(menu_bar)  # Adding the MenuBar to the Frame content.
+        self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = HexEditor(self)
