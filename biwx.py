@@ -13,6 +13,20 @@ import wx
 import wx.grid
 
 
+GRID_LINE_COLOUR = 'blue'
+
+
+class HexGrid(wx.grid.Grid):
+
+    def __init__(self, parent):
+        self.parent = parent
+        wx.grid.Grid.__init__(self, self.parent, -1)
+        self.SetGridLineColour(GRID_LINE_COLOUR)
+        self.SetRowLabelSize(70)
+        self.SetColLabelSize(27)
+        self.table = HexGridTable()
+
+
 class HexGridTable(wx.grid.PyGridTableBase):
 
     def __init__(self, *args, **kwags):
@@ -62,7 +76,7 @@ class HexEditor(wx.Panel):
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
 
-        hex_grid = wx.grid.Grid(self)
+        hex_grid = HexGrid(self)
         self.table = HexGridTable()
         hex_grid.SetTable(self.table)
 
@@ -122,6 +136,6 @@ class MainWindow(wx.Frame):
 
 if __name__ == '__main__':
     app = wx.App(False)
-    frame = MainWindow(None, title='biwx', size=(780, 510))
+    frame = MainWindow(None, title='biwx', size=(765, 510))
     frame.Show()
     app.MainLoop()
