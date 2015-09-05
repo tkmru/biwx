@@ -25,6 +25,7 @@ class HexGrid(wx.grid.Grid):
         self.SetRowLabelSize(70)
         self.SetColLabelSize(27)
         self.table = HexGridTable()
+        self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
 
 
 class HexGridTable(wx.grid.PyGridTableBase):
