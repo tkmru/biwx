@@ -3,7 +3,7 @@
 
 __description__ = 'Binary editer'
 __author__ = '@tkmru'
-__version__ = '0.1'
+__version__ = '0.x'
 __date__ = '2015/x/x'
 __maximum_python_version__ = (2, 7, 9)
 __copyright__ = 'Copyright (c) @tkmru'
@@ -34,7 +34,7 @@ class HexGridTable(wx.grid.PyGridTableBase):
         wx.grid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
-        self.binary_data = [['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '', '', '', '', '', '', '']]
+        self.binary_data = [['00', '11', '22', '33', '44', '55', '66', '77', '88', '99', '', '', '', '', '', '', '']]
 
     def GetNumberRows(self):
         if len(self.binary_data) > 23:
@@ -122,17 +122,37 @@ class MainWindow(wx.Frame):
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
 
         file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
-        file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
+        open_file = file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
         file_menu.Append(wx.ID_SAVE, '&Save')
 
         # creating the menubar.
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, "&File")
         self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
+        self.Bind(wx.EVT_MENU, self.open_file_dialog, open_file)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = HexEditor(self)
         sizer.Add(self.editor, 1, wx.EXPAND)
+
+    def _file_dialog(self, *args, **kwargs):
+        wildcard = 'Binary files (*.bin;*.txt)|*.bin;*.txt|All files (*.*)|*.*'
+        kwargs.update({
+            "wildcard": wildcard
+        })
+        dlg = wx.FileDialog(self, *args, **kwargs)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            dlg.Destroy()
+            return filename
+        dlg.Destroy()
+
+    def open_file_dialog(self, event):
+        filename = self._file_dialog("Load a file", style=wx.OPEN)
+        print filename
+        '''if filename:
+            self.LoadFile(filename)'''
+
 
 
 if __name__ == '__main__':
