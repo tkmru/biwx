@@ -10,7 +10,7 @@ __copyright__ = 'Copyright (c) @tkmru'
 __license__ = 'MIT License'
 
 import wx
-import wx.grid
+import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import os
 
@@ -18,11 +18,11 @@ import os
 GRID_LINE_COLOUR = 'blue'
 
 
-class HexGrid(wx.grid.Grid):
+class HexGrid(wxgrid.Grid):
 
     def __init__(self, parent):
         self.parent = parent
-        wx.grid.Grid.__init__(self, self.parent, -1)
+        wxgrid.Grid.__init__(self, self.parent, -1)
         self.SetGridLineColour(GRID_LINE_COLOUR)
         self.SetRowLabelSize(70)
         self.SetColLabelSize(27)
@@ -30,10 +30,10 @@ class HexGrid(wx.grid.Grid):
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
 
 
-class HexGridTable(wx.grid.PyGridTableBase):
+class HexGridTable(wxgrid.PyGridTableBase):
 
     def __init__(self, *args, **kwags):
-        wx.grid.PyGridTableBase.__init__(self)
+        wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
         self.binary_data = [['00', '11', '22', '33', '44', '55', '66', '77', '88', '99', '', '', '', '', '', '', '']]
