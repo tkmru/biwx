@@ -122,14 +122,14 @@ class MainWindow(wx.Frame):
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
 
         file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
-        open_file = file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
+        file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
         file_menu.Append(wx.ID_SAVE, '&Save')
 
         # creating the menubar.
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, "&File")
         self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
-        self.Bind(wx.EVT_MENU, self.open_file_dialog, open_file)
+        self.Connect(wx.ID_OPEN, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = HexEditor(self)
