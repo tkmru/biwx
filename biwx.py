@@ -11,6 +11,8 @@ __license__ = 'MIT License'
 
 import wx
 import wx.grid
+import wx.lib.agw.genericmessagedialog as wxgmd
+import os
 
 
 GRID_LINE_COLOUR = 'blue'
@@ -105,6 +107,9 @@ class HexEditor(wx.Panel):
         sizer.Add(hex_grid, 1, wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
+    def load_file(self, filename):
+        pass
+
 
 class MainWindow(wx.Frame):
 
@@ -136,23 +141,27 @@ class MainWindow(wx.Frame):
         sizer.Add(self.editor, 1, wx.EXPAND)
 
     def _file_dialog(self, *args, **kwargs):
-        wildcard = 'Binary files (*.bin;*.txt)|*.bin;*.txt|All files (*.*)|*.*'
-        kwargs.update({
-            "wildcard": wildcard
-        })
-        dlg = wx.FileDialog(self, *args, **kwargs)
-        if dlg.ShowModal() == wx.ID_OK:
-            filename = dlg.GetPath()
-            dlg.Destroy()
+        dialog = wx.FileDialog(self, *args, **kwargs)
+        if dialog.ShowModal() == wx.ID_OK:
+            filename = dialog.GetPath()
+            dialog.Destroy()
             return filename
-        dlg.Destroy()
+
+        dialog.Destroy()
 
     def open_file_dialog(self, event):
         filename = self._file_dialog("Load a file", style=wx.OPEN)
         print filename
-        '''if filename:
-            self.LoadFile(filename)'''
+        if os.path.isfile(filename):
+            self.editor.load_file(filename)
+        else:
+            message_box('Can not open file {0}.'.format(filename), 'Load File Error', wx.OK | wx.ICON_ERROR)
 
+
+def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
+    dialog = wxgmd.GenericMessageDialog(None, message, title, style)
+    dialog.ShowModal()
+    dialog.Destroy()
 
 
 if __name__ == '__main__':
