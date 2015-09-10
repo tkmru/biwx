@@ -32,11 +32,18 @@ class HexGrid(wxgrid.Grid):
 
 class HexGridTable(wxgrid.PyGridTableBase):
 
-    def __init__(self, *args, **kwags):
+    def __init__(self, binary=None):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
         self.binary_data = [['00', '11', '22', '33', '44', '55', '66', '77', '88', '99', '', '', '', '', '', '', '']]
+
+        if binary is not None:
+            self.binary_length = len(binary)
+        else:
+            self.binary_length = 0
+
+        self.binary = binary
 
     def GetNumberRows(self):
         if len(self.binary_data) > 23:
@@ -51,11 +58,21 @@ class HexGridTable(wxgrid.PyGridTableBase):
         return False
 
     def GetValue(self, row, col): # get initial value
-        try:
-            return self.binary_data[row][col]
+        if self.binary is None:
+            try:
+                return self.binary_data[row][col]
 
-        except IndexError:
-            return ''
+            except IndexError:
+                return ''
+
+        else:
+            addr = row * 17 + col
+
+            if addr <= self.binary_length:
+                return self.binary[addr: addr+2]
+
+            else:
+                return ''
 
     def SetValue(self, row, col, value): # change value
         try:
@@ -79,36 +96,42 @@ class HexEditor(wx.Panel):
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
 
-        hex_grid = HexGrid(self)
+        self.hex_grid = HexGrid(self)
         self.table = HexGridTable()
-        hex_grid.SetTable(self.table)
+        self.hex_grid.SetTable(self.table)
 
-        hex_grid.SetColSize(0, 30)
-        hex_grid.SetColSize(1, 30)
-        hex_grid.SetColSize(2, 30)
-        hex_grid.SetColSize(3, 30)
-        hex_grid.SetColSize(4, 30)
-        hex_grid.SetColSize(5, 30)
-        hex_grid.SetColSize(6, 30)
-        hex_grid.SetColSize(7, 30)
-        hex_grid.SetColSize(8, 30)
-        hex_grid.SetColSize(9, 30)
-        hex_grid.SetColSize(10, 30)
-        hex_grid.SetColSize(11, 30)
-        hex_grid.SetColSize(12, 30)
-        hex_grid.SetColSize(13, 30)
-        hex_grid.SetColSize(14, 30)
-        hex_grid.SetColSize(15, 30)
-        hex_grid.SetColSize(16, 200)
+        self.hex_grid.SetColSize(0, 30)
+        self.hex_grid.SetColSize(1, 30)
+        self.hex_grid.SetColSize(2, 30)
+        self.hex_grid.SetColSize(3, 30)
+        self.hex_grid.SetColSize(4, 30)
+        self.hex_grid.SetColSize(5, 30)
+        self.hex_grid.SetColSize(6, 30)
+        self.hex_grid.SetColSize(7, 30)
+        self.hex_grid.SetColSize(8, 30)
+        self.hex_grid.SetColSize(9, 30)
+        self.hex_grid.SetColSize(10, 30)
+        self.hex_grid.SetColSize(11, 30)
+        self.hex_grid.SetColSize(12, 30)
+        self.hex_grid.SetColSize(13, 30)
+        self.hex_grid.SetColSize(14, 30)
+        self.hex_grid.SetColSize(15, 30)
+        self.hex_grid.SetColSize(16, 200)
 
-        hex_grid.Refresh()
+        self.hex_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(hex_grid, 1, wx.EXPAND)
+        sizer.Add(self.hex_grid, 1, wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
     def load_file(self, filename):
-        pass
+        binary = 'aaaaaaaa'
+        self.hex_grid.BeginBatch()
+        #self.hex_grid.ClearGrid()
+        self.table = HexGridTable(binary)
+        self.hex_grid.SetTable(self.table)
+        #self.AutoSize()
+        self.hex_grid.EndBatch()
 
 
 class MainWindow(wx.Frame):
