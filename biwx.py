@@ -12,7 +12,8 @@ __license__ = 'MIT License'
 import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
-import os
+import struct
+import binascii
 import fy
 
 
@@ -66,10 +67,21 @@ class HexGridTable(wxgrid.PyGridTableBase):
                 return ''
 
         else:
-            addr = row * 17 + col
+            addr = row * 32 + col*2
 
             if addr <= self.binary_length:
-                return self.binary[addr: addr+2]
+                if col < 16:
+                    return self.binary[addr: addr+2]
+
+                else:
+                    s = ''
+                    for i in range(row*32, (row+1)*32+1, 2):
+                        dumped = chr(int(self.binary[i: i+2], 16))
+                        if dumped == '':
+                            s += '.'
+                        else:
+                            s += dumped
+                    return s
 
             else:
                 return ''
@@ -196,6 +208,23 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
     dialog = wxgmd.GenericMessageDialog(None, message, title, style)
     dialog.ShowModal()
     dialog.Destroy()
+
+
+def to_string(value):
+    result = ""
+    carry = ""
+    for i in range(0, len(value), 2):
+        v = value[i:i+2]
+        if len(carry) != 0:
+            v = carry + v
+            carry = ""
+            result += struct.pack(">H", int(v, 16))
+        else:
+            if int(v, 16) < 128:
+                result += struct.pack("B", int(v, 16))
+            else:
+                carry = v
+    return result
 
 
 if __name__ == '__main__':
