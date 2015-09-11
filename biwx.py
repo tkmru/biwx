@@ -34,7 +34,8 @@ class HexGridTable(wxgrid.PyGridTableBase):
     def __init__(self):
         wxgrid.PyGridTableBase.__init__(self)
 
-        self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
+        self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+                            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
         self.binary_data = '57656c636f6d6520746f20626977782121'
         self.binary_length = len(self.binary_data)
 
@@ -45,32 +46,34 @@ class HexGridTable(wxgrid.PyGridTableBase):
             return 23
 
     def GetNumberCols(self):
-        return 17
+        return 32
 
     def IsEmptyCell(self, row, col):
         return False
 
     def GetValue(self, row, col): # get initial value
-        addr = row * 32 + col*2
 
-        if addr <= self.binary_length:
-            if col < 16:
-                return self.binary_data[addr: addr+2]
+        if col < 16:
+            address = row * 32 + col*2
+            if address+2 <= self.binary_length:
+                return self.binary_data[address: address+2]
 
             else:
-                dumped = ''
-                for i in range(row*32, (row+1)*32, 2):
-                    ascii_number = int(self.binary_data[i: i+2], 16)
-
-                    if 0 <= ascii_number <= 32 or 127 <= ascii_number:
-                        dumped += ' . '
-                    else:
-                        dumped += chr(ascii_number)
-
-                return dumped
+                return ''
 
         else:
-            return ''
+            address = row * 32 + (col-16)*2
+            if address+2 <= self.binary_length:
+                ascii_number = int(self.binary_data[address: address+2], 16)
+
+                if 0 <= ascii_number <= 32 or 127 <= ascii_number:
+                    return '.'
+
+                else:
+                    return chr(ascii_number)
+
+            else:
+                return ''
 
     def SetValue(self, row, col, value): # change value
         try:
@@ -98,23 +101,11 @@ class HexEditor(wx.Panel):
         self.table = HexGridTable()
         self.hex_grid.SetTable(self.table)
 
-        self.hex_grid.SetColSize(0, 30)
-        self.hex_grid.SetColSize(1, 30)
-        self.hex_grid.SetColSize(2, 30)
-        self.hex_grid.SetColSize(3, 30)
-        self.hex_grid.SetColSize(4, 30)
-        self.hex_grid.SetColSize(5, 30)
-        self.hex_grid.SetColSize(6, 30)
-        self.hex_grid.SetColSize(7, 30)
-        self.hex_grid.SetColSize(8, 30)
-        self.hex_grid.SetColSize(9, 30)
-        self.hex_grid.SetColSize(10, 30)
-        self.hex_grid.SetColSize(11, 30)
-        self.hex_grid.SetColSize(12, 30)
-        self.hex_grid.SetColSize(13, 30)
-        self.hex_grid.SetColSize(14, 30)
-        self.hex_grid.SetColSize(15, 30)
-        self.hex_grid.SetColSize(16, 200)
+        for i in range(0, 16):
+            self.hex_grid.SetColSize(i, 30)
+
+        for i in range(16, 32):
+            self.hex_grid.SetColSize(i, 15)
 
         self.hex_grid.Refresh()
 

@@ -5,15 +5,15 @@ biwx
 | 'biwx' is binary editer.
 
 
-Installation
-============
+...Installation
+...============
 
 ..----
 ..PyPI
 ..----
 ..The recommended process is to install the PyPI package, as it allows easily staying update.
 
-..::
+..
 
 ..    $ pip install biwx
 
