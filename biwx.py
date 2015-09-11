@@ -74,14 +74,16 @@ class HexGridTable(wxgrid.PyGridTableBase):
                     return self.binary[addr: addr+2]
 
                 else:
-                    s = ''
-                    for i in range(row*32, (row+1)*32+1, 2):
-                        dumped = chr(int(self.binary[i: i+2], 16))
-                        if dumped == '':
-                            s += '.'
+                    dumped = ''
+                    for i in range(row*32, (row+1)*32, 2):
+                        ascii_number = int(self.binary[i: i+2], 16)
+
+                        if 0 <= ascii_number <= 32 or 127 <= ascii_number:
+                            dumped += ' . '
                         else:
-                            s += dumped
-                    return s
+                            dumped += chr(ascii_number)
+
+                    return dumped
 
             else:
                 return ''
