@@ -13,6 +13,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import os
+import fy
 
 
 GRID_LINE_COLOUR = 'blue'
@@ -26,7 +27,6 @@ class HexGrid(wxgrid.Grid):
         self.SetGridLineColour(GRID_LINE_COLOUR)
         self.SetRowLabelSize(70)
         self.SetColLabelSize(27)
-        self.table = HexGridTable()
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
 
 
@@ -125,13 +125,27 @@ class HexEditor(wx.Panel):
         self.SetSizerAndFit(sizer)
 
     def load_file(self, filename):
-        binary = 'aaaaaaaa'
-        self.hex_grid.BeginBatch()
-        #self.hex_grid.ClearGrid()
-        self.table = HexGridTable(binary)
-        self.hex_grid.SetTable(self.table)
-        #self.AutoSize()
-        self.hex_grid.EndBatch()
+        try:
+            binary = fy.get(filename)
+            # self.hex_grid.BeginBatch()
+            self.hex_grid.ClearGrid()
+            self.table = HexGridTable(binary)
+            self.hex_grid.SetTable(self.table)
+            # self.hex_grid.AutoSizeColumns(False)
+            '''
+            self.hex_grid.AutoSize()
+            self.hex_grid.AutoSizeColumns()
+            self.hex_grid.AutoSizeRows()
+            for i in range(17):
+                self.hex_grid.AutoSizeColLabelSize(i)
+            '''
+            self.hex_grid.AutoSize()
+            # self.hex_grid.AutoSizeColumns(False)
+            self.hex_grid.Refresh()
+            # self.hex_grid.EndBatch()
+
+        except:
+            message_box('Can not open file {0}.'.format(filename), 'Load File Error', wx.OK | wx.ICON_ERROR)
 
 
 class MainWindow(wx.Frame):
@@ -175,10 +189,7 @@ class MainWindow(wx.Frame):
     def open_file_dialog(self, event):
         filename = self._file_dialog("Load a file", style=wx.OPEN)
         print filename
-        if os.path.isfile(filename):
-            self.editor.load_file(filename)
-        else:
-            message_box('Can not open file {0}.'.format(filename), 'Load File Error', wx.OK | wx.ICON_ERROR)
+        self.editor.load_file(filename)
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
