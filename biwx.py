@@ -12,8 +12,6 @@ __license__ = 'MIT License'
 import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
-import struct
-import binascii
 import fy
 
 
@@ -33,18 +31,12 @@ class HexGrid(wxgrid.Grid):
 
 class HexGridTable(wxgrid.PyGridTableBase):
 
-    def __init__(self, binary=None):
+    def __init__(self):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '        Dump       ']
-        self.binary_data = [['00', '11', '22', '33', '44', '55', '66', '77', '88', '99', '', '', '', '', '', '', '']]
-
-        if binary is not None:
-            self.binary_length = len(binary)
-        else:
-            self.binary_length = 0
-
-        self.binary = binary
+        self.binary_data = '57656c636f6d6520746f20626977782121'
+        self.binary_length = len(self.binary_data)
 
     def GetNumberRows(self):
         if len(self.binary_data) > 23:
@@ -59,34 +51,26 @@ class HexGridTable(wxgrid.PyGridTableBase):
         return False
 
     def GetValue(self, row, col): # get initial value
-        if self.binary is None:
-            try:
-                return self.binary_data[row][col]
+        addr = row * 32 + col*2
 
-            except IndexError:
-                return ''
-
-        else:
-            addr = row * 32 + col*2
-
-            if addr <= self.binary_length:
-                if col < 16:
-                    return self.binary[addr: addr+2]
-
-                else:
-                    dumped = ''
-                    for i in range(row*32, (row+1)*32, 2):
-                        ascii_number = int(self.binary[i: i+2], 16)
-
-                        if 0 <= ascii_number <= 32 or 127 <= ascii_number:
-                            dumped += ' . '
-                        else:
-                            dumped += chr(ascii_number)
-
-                    return dumped
+        if addr <= self.binary_length:
+            if col < 16:
+                return self.binary_data[addr: addr+2]
 
             else:
-                return ''
+                dumped = ''
+                for i in range(row*32, (row+1)*32, 2):
+                    ascii_number = int(self.binary_data[i: i+2], 16)
+
+                    if 0 <= ascii_number <= 32 or 127 <= ascii_number:
+                        dumped += ' . '
+                    else:
+                        dumped += chr(ascii_number)
+
+                return dumped
+
+        else:
+            return ''
 
     def SetValue(self, row, col, value): # change value
         try:
@@ -140,23 +124,11 @@ class HexEditor(wx.Panel):
 
     def load_file(self, filename):
         try:
-            binary = fy.get(filename)
-            # self.hex_grid.BeginBatch()
-            self.hex_grid.ClearGrid()
-            self.table = HexGridTable(binary)
-            self.hex_grid.SetTable(self.table)
-            # self.hex_grid.AutoSizeColumns(False)
-            '''
-            self.hex_grid.AutoSize()
-            self.hex_grid.AutoSizeColumns()
-            self.hex_grid.AutoSizeRows()
-            for i in range(17):
-                self.hex_grid.AutoSizeColLabelSize(i)
-            '''
-            self.hex_grid.AutoSize()
-            # self.hex_grid.AutoSizeColumns(False)
-            self.hex_grid.Refresh()
-            # self.hex_grid.EndBatch()
+            new_binary = fy.get(filename)
+            self.table.binary_data = new_binary
+            self.table.binary_length = len(new_binary)
+
+            self.hex_grid.ForceRefresh()
 
         except:
             message_box('Can not open file {0}.'.format(filename), 'Load File Error', wx.OK | wx.ICON_ERROR)
@@ -210,23 +182,6 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
     dialog = wxgmd.GenericMessageDialog(None, message, title, style)
     dialog.ShowModal()
     dialog.Destroy()
-
-
-def to_string(value):
-    result = ""
-    carry = ""
-    for i in range(0, len(value), 2):
-        v = value[i:i+2]
-        if len(carry) != 0:
-            v = carry + v
-            carry = ""
-            result += struct.pack(">H", int(v, 16))
-        else:
-            if int(v, 16) < 128:
-                result += struct.pack("B", int(v, 16))
-            else:
-                carry = v
-    return result
 
 
 if __name__ == '__main__':
