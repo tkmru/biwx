@@ -32,7 +32,7 @@ class ScrollBinder(object):
         self._bound_widget = None
         self._is_list_control = hasattr(self, 'ScrollList')
 
-        self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
+        #self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mousewheel)
         self.Bind(wx.EVT_SCROLLWIN_LINEUP, self._lineup)
         self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self._linedown)
@@ -128,8 +128,9 @@ class ScrollBinder(object):
             return
 
         pos = self.GetScrollPos(wx.VERTICAL)
-        self._bound_widget.scroll_to(pos + 1)
-        self.scroll_to(pos + 1)
+        print pos
+        self.scroll_to(pos)
+        self._bound_widget.scroll_to(pos)
 
     def _did_scroll(self, event):
         '''Event handler for manual scrolling.'''
@@ -141,8 +142,8 @@ class ScrollBinder(object):
             event.Skip()
 
     def scroll_to(self, position):
-        '''f(int)-> None
-
+        '''
+        f(int)-> None
         Scrolls to a specific vertical position.
         '''
         self._locked = True
@@ -322,9 +323,9 @@ class Editor(wx.Panel):
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
-    def load_file(self, filename):
+    def load_file(self, file_path):
         try:
-            new_binary = fy.get(filename)
+            new_binary = fy.get(file_path)
             self.hex_table.binary_data = new_binary
             self.hex_table.binary_length = len(new_binary)
             self.hex_grid.ForceRefresh()
@@ -334,7 +335,7 @@ class Editor(wx.Panel):
             self.dump_grid.ForceRefresh()
 
         except:
-            message_box('Can not open file {0}.'.format(filename), 'Load File Error', wx.OK | wx.ICON_ERROR)
+            message_box('Can not open file {0}.'.format(file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
 
 
 class MainWindow(wx.Frame):
@@ -371,16 +372,18 @@ class MainWindow(wx.Frame):
     def _file_dialog(self, *args, **kwargs):
         dialog = wx.FileDialog(self, *args, **kwargs)
         if dialog.ShowModal() == wx.ID_OK:
-            filename = dialog.GetPath()
+            file_path = dialog.GetPath()
             dialog.Destroy()
-            return filename
+
+            return file_path
 
         dialog.Destroy()
 
     def open_file_dialog(self, event):
-        filename = self._file_dialog('Load a file', style=wx.OPEN)
-        print filename
-        self.editor.load_file(filename)
+        file_path = self._file_dialog('Load a file', style=wx.OPEN)
+        print file_path
+        self.editor.load_file(file_path)
+        self.SetStatusText('Opened file "{0}".'.format(file_path))
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
