@@ -1,13 +1,5 @@
 #!/usr/bin/env python2.7
-# coding: UTF-8
-
-__description__ = 'Binary editer'
-__author__ = '@tkmru'
-__version__ = '0.x'
-__date__ = '2015/x/x'
-__maximum_python_version__ = (2, 7, 9)
-__copyright__ = 'Copyright (c) @tkmru'
-__license__ = 'MIT License'
+# coding:UTF-8
 
 import wx
 import wx.grid as wxgrid
@@ -16,26 +8,170 @@ import fy
 
 
 GRID_LINE_COLOUR = 'blue'
+NUM_DATA = 200
+ROW_SIZE = 27
+MAGIC_LIST_HEIGHT = 5
 
 
-class HexGrid(wxgrid.Grid):
+class ScrollBinder():
+    """Inherit to be able to bind vscrolling to another widget."""
+    def __init__(self):
+        """f() -> ScrollBinder
+
+        Initialises the internal data required for vertical scrolling.
+        """
+        self._locked = False
+        self._bound_widget = None
+        self._is_list_control = hasattr(self, "ScrollList")
+
+        self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
+        self.Bind(wx.EVT_MOUSEWHEEL, self._mousewheel)
+        self.Bind(wx.EVT_SCROLLWIN_LINEUP, self._lineup)
+        self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self._linedown)
+        self.Bind(wx.EVT_SCROLLWIN_PAGEUP, self._pageup)
+        self.Bind(wx.EVT_SCROLLWIN_PAGEDOWN, self._pagedown)
+        self.Bind(wx.EVT_SCROLLWIN_TOP, self._top)
+        self.Bind(wx.EVT_SCROLLWIN_BOTTOM, self._bottom)
+        self.Bind(wx.EVT_KEY_DOWN, self._key_down)
+
+    def bind_scroll(self, to):
+        self._bound_widget = to
+
+    def _key_down(self, event):
+        pass
+
+    def _mousewheel(self, event):
+        """Mouse wheel scrolled. Up or down, give or take."""
+        '''
+        if event.m_wheelRotation > 0:
+                do_scroll = self._lineup
+        else:
+                do_scroll = self._linedown
+
+        for r in range(event.m_linesPerAction):
+                do_scroll()
+        '''
+
+    def _pageup(self, event):
+        """Clicked on a scrollbar space, performing a page up."""
+        if event.GetOrientation() != wx.VERTICAL:
+            event.Skip()
+            return
+
+        pos = self.GetScrollPos(wx.VERTICAL)
+        if self._is_list_control:
+            amount = self.GetCountPerPage()
+        else:
+            amount = self.GetScrollPageSize(wx.VERTICAL)
+
+        self._bound_widget.scroll_to(max(0, pos - amount))
+        self.scroll_to(max(0, pos - amount))
+
+    def _pagedown(self, event):
+        """Clicked on a scrollbar space, performing a page down."""
+        if event.GetOrientation() != wx.VERTICAL:
+            event.Skip()
+            return
+
+        pos = self.GetScrollPos(wx.VERTICAL)
+        if self._is_list_control:
+            amount = self.GetCountPerPage()
+        else:
+            amount = self.GetScrollPageSize(wx.VERTICAL)
+
+        self._bound_widget.scroll_to(pos + amount)
+        self.scroll_to(pos + amount)
+
+    def _top(self, event):
+        """Event handler for going to the top."""
+        if event.GetOrientation() != wx.VERTICAL:
+            event.Skip()
+            return
+
+        self._bound_widget.scroll_to(0)
+        self.scroll_to(0)
+
+    def _bottom(self, event):
+        """Event handler for going to the bottom."""
+        if event.GetOrientation() != wx.VERTICAL:
+            event.Skip()
+            return
+
+        pos = 10000000
+        self._bound_widget.scroll_to(pos)
+        self.scroll_to(pos)
+
+    def _lineup(self, event=None):
+        """Event handler for pressing the up arrow."""
+        if event and event.GetOrientation() != wx.VERTICAL:
+            event.Skip()
+            return
+
+        pos = self.GetScrollPos(wx.VERTICAL)
+        self._bound_widget.scroll_to(pos - 1)
+        self.scroll_to(pos - 1)
+
+    def _linedown(self, event=None):
+        """Event handler for pressing the down arrow."""
+        if event and event.GetOrientation() != wx.VERTICAL:
+            event.Skip()
+            return
+
+        pos = self.GetScrollPos(wx.VERTICAL)
+        self._bound_widget.scroll_to(pos + 1)
+        self.scroll_to(pos + 1)
+
+    def _did_scroll(self, event):
+        """Event handler for manual scrolling."""
+        try:
+            if event.GetOrientation() != wx.VERTICAL or self._locked:
+                return
+
+        finally:
+            event.Skip()
+
+    def scroll_to(self, position):
+        """f(int)-> None
+
+        Scrolls to a specific vertical position.
+        """
+        self._locked = True
+
+        if self._is_list_control:
+            diff = position - self.GetScrollPos(wx.VERTICAL)
+            self.ScrollList(-1, diff * ROW_SIZE)
+
+        else:
+            # Presume we are a grid.
+            self.Scroll(-1, position)
+
+        self._locked = False
+
+
+class DumpGrid(wxgrid.Grid, ScrollBinder):
 
     def __init__(self, parent):
         self.parent = parent
         wxgrid.Grid.__init__(self, self.parent, -1)
+        ScrollBinder.__init__(self)
         self.SetGridLineColour(GRID_LINE_COLOUR)
-        self.SetRowLabelSize(70)
         self.SetColLabelSize(27)
+        self.HideRowLabels()
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
 
+        # Disallow rows stretching vertically and set a fixed height.
+        self.DisableDragRowSize()
+        self.SetRowMinimalAcceptableHeight(ROW_SIZE)
+        self.SetDefaultRowSize(ROW_SIZE, True)
+        self.SetScrollRate(self.GetScrollLineX(), ROW_SIZE)
 
-class HexGridTable(wxgrid.PyGridTableBase):
+
+class DumpGridTable(wxgrid.PyGridTableBase):
 
     def __init__(self):
         wxgrid.PyGridTableBase.__init__(self)
 
-        self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-                            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+        self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
         self.binary_data = '57656c636f6d6520746f20626977782121'
         self.binary_length = len(self.binary_data)
 
@@ -46,34 +182,82 @@ class HexGridTable(wxgrid.PyGridTableBase):
             return 23
 
     def GetNumberCols(self):
-        return 32
+        return 16
 
     def IsEmptyCell(self, row, col):
         return False
 
     def GetValue(self, row, col): # get initial value
+        address = row * 32 + col*2
+        if address+2 <= self.binary_length:
+            ascii_number = int(self.binary_data[address: address+2], 16)
 
-        if col < 16:
-            address = row * 32 + col*2
-            if address+2 <= self.binary_length:
-                return self.binary_data[address: address+2]
+            if 0 <= ascii_number <= 32 or 127 <= ascii_number:
+                return '.'
 
             else:
-                return ''
+                return chr(ascii_number)
 
         else:
-            address = row * 32 + (col-16)*2
-            if address+2 <= self.binary_length:
-                ascii_number = int(self.binary_data[address: address+2], 16)
+            return ''
 
-                if 0 <= ascii_number <= 32 or 127 <= ascii_number:
-                    return '.'
+    def SetValue(self, row, col, value): # change value
+        try:
+            self.binary_data[row][col] = value
 
-                else:
-                    return chr(ascii_number)
+        except IndexError:
+            for i in range(row - len(self.binary_data) + 1):
+                self.binary_data.append(['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
 
-            else:
-                return ''
+            self.binary_data[row][col] = value
+
+
+class HexGrid(wxgrid.Grid, ScrollBinder):
+
+    def __init__(self, parent):
+        self.parent = parent
+        wxgrid.Grid.__init__(self, self.parent, -1)
+        ScrollBinder.__init__(self)
+        self.SetGridLineColour(GRID_LINE_COLOUR)
+        self.SetRowLabelSize(70)
+        self.SetColLabelSize(27)
+        self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+
+        # Disallow rows stretching vertically and set a fixed height.
+        self.DisableDragRowSize()
+        self.SetRowMinimalAcceptableHeight(ROW_SIZE)
+        self.SetDefaultRowSize(ROW_SIZE, True)
+        self.SetScrollRate(self.GetScrollLineX(), ROW_SIZE)
+
+
+class HexGridTable(wxgrid.PyGridTableBase):
+
+    def __init__(self):
+        wxgrid.PyGridTableBase.__init__(self)
+
+        self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+        self.binary_data = '57656c636f6d6520746f20626977782121'
+        self.binary_length = len(self.binary_data)
+
+    def GetNumberRows(self):
+        if len(self.binary_data) > 23:
+            return len(self.binary_data)
+        else:
+            return 23
+
+    def GetNumberCols(self):
+        return 16
+
+    def IsEmptyCell(self, row, col):
+        return False
+
+    def GetValue(self, row, col): # get initial value
+        address = row * 32 + col*2
+        if address+2 <= self.binary_length:
+            return self.binary_data[address: address+2]
+
+        else:
+            return ''
 
     def SetValue(self, row, col, value): # change value
         try:
@@ -98,26 +282,39 @@ class HexEditor(wx.Panel):
         wx.Panel.__init__(self, *args, **kwags)
 
         self.hex_grid = HexGrid(self)
-        self.table = HexGridTable()
-        self.hex_grid.SetTable(self.table)
+        self.hex_table = HexGridTable()
+        self.hex_grid.SetTable(self.hex_table)
+
+        self.dump_grid = DumpGrid(self)
+        self.dump_table = DumpGridTable()
+        self.dump_grid.SetTable(self.dump_table)
+
+        # Bind the scrollbars of the widgets.
+        self.hex_grid.bind_scroll(self.dump_grid)
+        self.dump_grid.bind_scroll(self.hex_grid)
 
         for i in range(0, 16):
             self.hex_grid.SetColSize(i, 30)
 
-        for i in range(16, 32):
-            self.hex_grid.SetColSize(i, 15)
+        for i in range(0, 16):
+            self.dump_grid.SetColSize(i, 15)
 
         self.hex_grid.Refresh()
+        self.dump_grid.Refresh()
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.hex_grid, 1, wx.EXPAND)
+        sizer.Add(self.dump_grid, 1, wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
     def load_file(self, filename):
         try:
             new_binary = fy.get(filename)
-            self.table.binary_data = new_binary
-            self.table.binary_length = len(new_binary)
+            self.hex_table.binary_data = new_binary
+            self.hex_table.binary_length = len(new_binary)
+
+            self.dump_table.binary_data = new_binary
+            self.dump_table.binary_length = len(new_binary)
 
             self.hex_grid.ForceRefresh()
 
