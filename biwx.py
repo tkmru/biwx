@@ -42,8 +42,8 @@ class ScrollBinder(object):
         self.Bind(wx.EVT_SCROLLWIN_BOTTOM, self._bottom)
         self.Bind(wx.EVT_KEY_DOWN, self._key_down)
 
-    def bind_scroll(self, to):
-        self._bound_widget = to
+    def bind_scroll(self, target):
+        self._bound_widget = target
 
     def _key_down(self, event):
         pass
@@ -111,15 +111,15 @@ class ScrollBinder(object):
         self._bound_widget.scroll_to(pos)
         self.scroll_to(pos)
 
-    def _lineup(self, event=None):
+    def _lineup(self, event=None): # maybe wrong
         '''Event handler for pressing the up arrow.'''
         if event and event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
 
         pos = self.GetScrollPos(wx.VERTICAL)
-        self._bound_widget.scroll_to(pos - 1)
-        self.scroll_to(pos - 1)
+        self._bound_widget.scroll_to(pos)
+        self.scroll_to(pos)
 
     def _linedown(self, event=None):
         '''Event handler for pressing the down arrow.'''
@@ -236,7 +236,7 @@ class HexGrid(wxgrid.Grid, ScrollBinder):
         self.SetColLabelSize(COL_LABEL_SIZE)
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
         # http://stackoverflow.com/questions/4852972/wxpython-wxgrid-without-vertical-scrollbar
-        # self.ShowScrollbars(wx.SHOW_SB_DEFAULT, wx.SHOW_SB_NEVER)
+        self.ShowScrollbars(wx.SHOW_SB_DEFAULT, wx.SHOW_SB_NEVER)
 
         # Disallow rows stretching vertically and set a fixed height.
         self.DisableDragRowSize()
@@ -318,8 +318,8 @@ class Editor(wx.Panel):
         self.dump_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.hex_grid, 1, wx.EXPAND | wx.RIGHT, border=10)
-        sizer.Add(self.dump_grid, 1, wx.EXPAND)
+        sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=10)
+        sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
     def load_file(self, filename):
