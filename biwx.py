@@ -8,21 +8,26 @@ import fy
 
 
 GRID_LINE_COLOUR = 'blue'
-NUM_DATA = 200
-ROW_SIZE = 27
-MAGIC_LIST_HEIGHT = 5
+ROW_SIZE = 20
+ROW_LABEL_SIZE = 70
+COL_LABEL_SIZE = 27
 
 
 class ScrollBinder():
-    """Inherit to be able to bind vscrolling to another widget."""
+
+    '''
+    http://wxpython-users.1045709.n5.nabble.com/Scrolling-grids-simultaneously-td2349695.html
+    Inherit to be able to bind vscrolling to another widget.
+    '''
+
     def __init__(self):
-        """f() -> ScrollBinder
+        '''f() -> ScrollBinder
 
         Initialises the internal data required for vertical scrolling.
-        """
+        '''
         self._locked = False
         self._bound_widget = None
-        self._is_list_control = hasattr(self, "ScrollList")
+        self._is_list_control = hasattr(self, 'ScrollList')
 
         self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mousewheel)
@@ -41,7 +46,7 @@ class ScrollBinder():
         pass
 
     def _mousewheel(self, event):
-        """Mouse wheel scrolled. Up or down, give or take."""
+        '''Mouse wheel scrolled. Up or down, give or take.'''
         '''
         if event.m_wheelRotation > 0:
                 do_scroll = self._lineup
@@ -53,7 +58,7 @@ class ScrollBinder():
         '''
 
     def _pageup(self, event):
-        """Clicked on a scrollbar space, performing a page up."""
+        '''Clicked on a scrollbar space, performing a page up.'''
         if event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
@@ -68,7 +73,7 @@ class ScrollBinder():
         self.scroll_to(max(0, pos - amount))
 
     def _pagedown(self, event):
-        """Clicked on a scrollbar space, performing a page down."""
+        '''Clicked on a scrollbar space, performing a page down.'''
         if event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
@@ -83,7 +88,7 @@ class ScrollBinder():
         self.scroll_to(pos + amount)
 
     def _top(self, event):
-        """Event handler for going to the top."""
+        '''Event handler for going to the top.'''
         if event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
@@ -92,7 +97,7 @@ class ScrollBinder():
         self.scroll_to(0)
 
     def _bottom(self, event):
-        """Event handler for going to the bottom."""
+        '''Event handler for going to the bottom.'''
         if event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
@@ -102,7 +107,7 @@ class ScrollBinder():
         self.scroll_to(pos)
 
     def _lineup(self, event=None):
-        """Event handler for pressing the up arrow."""
+        '''Event handler for pressing the up arrow.'''
         if event and event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
@@ -112,7 +117,7 @@ class ScrollBinder():
         self.scroll_to(pos - 1)
 
     def _linedown(self, event=None):
-        """Event handler for pressing the down arrow."""
+        '''Event handler for pressing the down arrow.'''
         if event and event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
@@ -122,7 +127,7 @@ class ScrollBinder():
         self.scroll_to(pos + 1)
 
     def _did_scroll(self, event):
-        """Event handler for manual scrolling."""
+        '''Event handler for manual scrolling.'''
         try:
             if event.GetOrientation() != wx.VERTICAL or self._locked:
                 return
@@ -131,10 +136,10 @@ class ScrollBinder():
             event.Skip()
 
     def scroll_to(self, position):
-        """f(int)-> None
+        '''f(int)-> None
 
         Scrolls to a specific vertical position.
-        """
+        '''
         self._locked = True
 
         if self._is_list_control:
@@ -155,7 +160,7 @@ class DumpGrid(wxgrid.Grid, ScrollBinder):
         wxgrid.Grid.__init__(self, self.parent, -1)
         ScrollBinder.__init__(self)
         self.SetGridLineColour(GRID_LINE_COLOUR)
-        self.SetColLabelSize(27)
+        self.SetColLabelSize(COL_LABEL_SIZE)
         self.HideRowLabels()
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
 
@@ -219,8 +224,8 @@ class HexGrid(wxgrid.Grid, ScrollBinder):
         wxgrid.Grid.__init__(self, self.parent, -1)
         ScrollBinder.__init__(self)
         self.SetGridLineColour(GRID_LINE_COLOUR)
-        self.SetRowLabelSize(70)
-        self.SetColLabelSize(27)
+        self.SetRowLabelSize(ROW_LABEL_SIZE)
+        self.SetColLabelSize(COL_LABEL_SIZE)
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
 
         # Disallow rows stretching vertically and set a fixed height.
@@ -334,7 +339,7 @@ class MainWindow(wx.Frame):
 
         # on OSX Cocoa both the about and the quit menu belong to the bold 'app menu'.
         file_menu.Append(wx.ID_ABOUT, '&About', 'Information about this program')
-        file_menu.Append(wx.ID_PREFERENCES, "&Preferences")
+        file_menu.Append(wx.ID_PREFERENCES, '&Preferences')
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
 
         file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
@@ -343,7 +348,7 @@ class MainWindow(wx.Frame):
 
         # creating the menubar.
         menu_bar = wx.MenuBar()
-        menu_bar.Append(file_menu, "&File")
+        menu_bar.Append(file_menu, '&File')
         self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
         self.Connect(wx.ID_OPEN, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
 
@@ -361,7 +366,7 @@ class MainWindow(wx.Frame):
         dialog.Destroy()
 
     def open_file_dialog(self, event):
-        filename = self._file_dialog("Load a file", style=wx.OPEN)
+        filename = self._file_dialog('Load a file', style=wx.OPEN)
         print filename
         self.editor.load_file(filename)
 
@@ -374,6 +379,6 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
 
 if __name__ == '__main__':
     app = wx.App(False)
-    frame = MainWindow(None, title='biwx', size=(765, 510))
+    frame = MainWindow(None, title='biwx', size=(900, 510))
     frame.Show()
     app.MainLoop()
