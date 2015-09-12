@@ -128,7 +128,6 @@ class ScrollBinder(object):
             return
 
         pos = self.GetScrollPos(wx.VERTICAL)
-        print pos
         self.scroll_to(pos)
         self._bound_widget.scroll_to(pos)
 
@@ -187,8 +186,9 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         self.binary_length = len(self.binary_data)
 
     def GetNumberRows(self):
-        if len(self.binary_data) > 23:
-            return len(self.binary_data)
+        needed_row = self.binary_length/32 + 1
+        if needed_row > 23:
+            return needed_row
         else:
             return 23
 
@@ -256,8 +256,9 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.binary_length = len(self.binary_data)
 
     def GetNumberRows(self):
-        if len(self.binary_data) > 23:
-            return len(self.binary_data)
+        needed_row = self.binary_length/32 + 1
+        if needed_row > 23:
+            return needed_row
         else:
             return 23
 
