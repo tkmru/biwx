@@ -50,15 +50,17 @@ class ScrollBinder(object):
 
     def _mousewheel(self, event):
         '''Mouse wheel scrolled. Up or down, give or take.'''
-        '''
-        if event.m_wheelRotation > 0:
+        try:
+            if event.m_wheelRotation > 0:
                 do_scroll = self._lineup
-        else:
+            else:
                 do_scroll = self._linedown
 
-        for r in range(event.m_linesPerAction):
+            for r in range(event.m_linesPerAction):
                 do_scroll()
-        '''
+
+        except AttributeError:
+            pass
 
     def _pageup(self, event):
         '''Clicked on a scrollbar space, performing a page up.'''
