@@ -5,9 +5,12 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
+# from multiprocessing import Process
 
 
-GRID_LINE_COLOUR = 'gray'
+GRID_LINE_COLOUR = '#e7daf7'
+BACKGROUND_COLOUR = 'white'
+
 ROW_SIZE = 20
 ROW_LABEL_SIZE = 70
 COL_LABEL_SIZE = 27
@@ -21,8 +24,8 @@ class ScrollBinder(object):
     '''
 
     def __init__(self):
-        '''f() -> ScrollBinder
-
+        '''
+        f() -> ScrollBinder
         Initialises the internal data required for vertical scrolling.
         '''
         self._locked = False
@@ -231,7 +234,7 @@ class HexGrid(wxgrid.Grid, ScrollBinder):
         self.SetColLabelSize(COL_LABEL_SIZE)
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
         # http://stackoverflow.com/questions/4852972/wxpython-wxgrid-without-vertical-scrollbar
-        self.ShowScrollbars(wx.SHOW_SB_DEFAULT, wx.SHOW_SB_NEVER)
+        # self.ShowScrollbars(wx.SHOW_SB_DEFAULT, wx.SHOW_SB_NEVER)
 
         # Disallow rows stretching vertically and set a fixed height.
         self.DisableDragRowSize()
@@ -322,11 +325,11 @@ class Editor(wx.Panel):
             new_binary = fy.get(filename)
             self.hex_table.binary_data = new_binary
             self.hex_table.binary_length = len(new_binary)
+            self.hex_grid.ForceRefresh()
 
             self.dump_table.binary_data = new_binary
             self.dump_table.binary_length = len(new_binary)
-
-            self.hex_grid.ForceRefresh()
+            self.dump_grid.ForceRefresh()
 
         except:
             message_box('Can not open file {0}.'.format(filename), 'Load File Error', wx.OK | wx.ICON_ERROR)
@@ -360,6 +363,8 @@ class MainWindow(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = Editor(self)
         sizer.Add(self.editor, 1, wx.EXPAND)
+
+        self.SetBackgroundColour(BACKGROUND_COLOUR)
 
     def _file_dialog(self, *args, **kwargs):
         dialog = wx.FileDialog(self, *args, **kwargs)
