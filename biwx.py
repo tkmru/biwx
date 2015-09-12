@@ -7,13 +7,13 @@ import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
 
 
-GRID_LINE_COLOUR = 'blue'
+GRID_LINE_COLOUR = 'gray'
 ROW_SIZE = 20
 ROW_LABEL_SIZE = 70
 COL_LABEL_SIZE = 27
 
 
-class ScrollBinder():
+class ScrollBinder(object):
 
     '''
     http://wxpython-users.1045709.n5.nabble.com/Scrolling-grids-simultaneously-td2349695.html
@@ -216,6 +216,9 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
             self.binary_data[row][col] = value
 
+    def GetColLabelValue(self, col):
+        return self.cols_labels[col]
+
 
 class HexGrid(wxgrid.Grid, ScrollBinder):
 
@@ -227,6 +230,8 @@ class HexGrid(wxgrid.Grid, ScrollBinder):
         self.SetRowLabelSize(ROW_LABEL_SIZE)
         self.SetColLabelSize(COL_LABEL_SIZE)
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+        # http://stackoverflow.com/questions/4852972/wxpython-wxgrid-without-vertical-scrollbar
+        self.ShowScrollbars(wx.SHOW_SB_DEFAULT, wx.SHOW_SB_NEVER)
 
         # Disallow rows stretching vertically and set a fixed height.
         self.DisableDragRowSize()
@@ -281,7 +286,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         return '0x{0:X}'.format(row * 16)
 
 
-class HexEditor(wx.Panel):
+class Editor(wx.Panel):
 
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
@@ -308,7 +313,7 @@ class HexEditor(wx.Panel):
         self.dump_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.hex_grid, 1, wx.EXPAND)
+        sizer.Add(self.hex_grid, 1, wx.EXPAND | wx.RIGHT, border=10)
         sizer.Add(self.dump_grid, 1, wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
@@ -353,7 +358,7 @@ class MainWindow(wx.Frame):
         self.Connect(wx.ID_OPEN, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.editor = HexEditor(self)
+        self.editor = Editor(self)
         sizer.Add(self.editor, 1, wx.EXPAND)
 
     def _file_dialog(self, *args, **kwargs):
@@ -379,6 +384,6 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
 
 if __name__ == '__main__':
     app = wx.App(False)
-    frame = MainWindow(None, title='biwx', size=(900, 510))
+    frame = MainWindow(None, title='biwx', size=(820, 510))
     frame.Show()
     app.MainLoop()
