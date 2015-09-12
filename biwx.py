@@ -15,6 +15,9 @@ ROW_SIZE = 20
 ROW_LABEL_SIZE = 70
 COL_LABEL_SIZE = 27
 
+DUMP_FONT_SIZE = 12
+HEX_FONT_SIZE = 13
+
 
 class ScrollBinder(object):
 
@@ -32,7 +35,7 @@ class ScrollBinder(object):
         self._bound_widget = None
         self._is_list_control = hasattr(self, 'ScrollList')
 
-        #self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
+        self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mousewheel)
         self.Bind(wx.EVT_SCROLLWIN_LINEUP, self._lineup)
         self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self._linedown)
@@ -185,6 +188,9 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         self.binary_data = '57656c636f6d6520746f20626977782121'
         self.binary_length = len(self.binary_data)
 
+        self.font_attr = wx.grid.GridCellAttr()
+        self.font_attr.SetFont(wx.Font(DUMP_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
+
     def GetNumberRows(self):
         needed_row = self.binary_length/32 + 1
         if needed_row > 23:
@@ -225,6 +231,11 @@ class DumpGridTable(wxgrid.PyGridTableBase):
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
 
+    def GetAttr(self, row, col, kind):
+        attr = self.font_attr
+        attr.IncRef()
+        return attr
+
 
 class HexGrid(wxgrid.Grid, ScrollBinder):
 
@@ -254,6 +265,9 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
         self.binary_data = '57656c636f6d6520746f20626977782121'
         self.binary_length = len(self.binary_data)
+
+        self.font_attr = wx.grid.GridCellAttr()
+        self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
 
     def GetNumberRows(self):
         needed_row = self.binary_length/32 + 1
@@ -292,6 +306,11 @@ class HexGridTable(wxgrid.PyGridTableBase):
     def GetRowLabelValue(self, row):
         return '0x{0:X}'.format(row * 16)
 
+    def GetAttr(self, row, col, kind):
+        attr = self.font_attr
+        attr.IncRef()
+        return attr
+
 
 class Editor(wx.Panel):
 
@@ -320,7 +339,7 @@ class Editor(wx.Panel):
         self.dump_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=10)
+        sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=5)
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
@@ -395,6 +414,6 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
 
 if __name__ == '__main__':
     app = wx.App(False)
-    frame = MainWindow(None, title='biwx', size=(820, 510))
+    frame = MainWindow(None, title='biwx', size=(810, 510))
     frame.Show()
     app.MainLoop()
