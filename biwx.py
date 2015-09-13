@@ -9,7 +9,8 @@ import fy
 
 
 GRID_LINE_COLOUR = '#e7daf7'
-BACKGROUND_COLOUR = 'white'
+BACKGROUND_COLOUR = '#e8e8e8'
+TEXT_COLOUR = '#252525'
 
 ROW_SIZE = 20
 ROW_LABEL_SIZE = 70
@@ -190,6 +191,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
         self.font_attr = wx.grid.GridCellAttr()
         self.font_attr.SetFont(wx.Font(DUMP_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
+        self.font_attr.SetTextColour(TEXT_COLOUR)
 
     def GetNumberRows(self):
         needed_row = self.binary_length/32 + 1
@@ -268,6 +270,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
         self.font_attr = wx.grid.GridCellAttr()
         self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
+        self.font_attr.SetTextColour(TEXT_COLOUR)
 
     def GetNumberRows(self):
         needed_row = self.binary_length/32 + 1
@@ -304,7 +307,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         return self.cols_labels[col]
 
     def GetRowLabelValue(self, row):
-        return '0x{0:X}'.format(row * 16)
+        return '0x{0:0>6X}'.format(row * 16)
 
     def GetAttr(self, row, col, kind):
         attr = self.font_attr
@@ -339,7 +342,7 @@ class Editor(wx.Panel):
         self.dump_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=5)
+        sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=3)
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
