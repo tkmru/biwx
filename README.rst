@@ -2,20 +2,21 @@
 biwx
 ====
 
-| 'biwx' is binary editer.
+| 'biwx' is binary editer. It doesn't still work...
 
-
-...Installation
-...============
-
-..----
-..PyPI
-..----
-..The recommended process is to install the PyPI package, as it allows easily staying update.
 
 ..
+  Installation
+  ============
 
-..    $ pip install biwx
+  ----
+  PyPI
+  ----
+  The recommended process is to install the PyPI package, as it allows easily staying update.
+
+
+
+     $ pip install biwx
 
 
 License
