@@ -5,7 +5,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
-# from multiprocessing import Process
+#from multiprocessing import Process
 
 
 GRID_LINE_COLOUR = '#e7daf7'
@@ -415,8 +415,14 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
     dialog.Destroy()
 
 
+class MyApp(wx.App):
+    def OnInit(self):
+        self.frame = MainWindow(None, title='biwx', size=(810, 510))
+        self.frame.Show()
+        self.SetTopWindow(self.frame)
+        return True
+
+
 if __name__ == '__main__':
-    app = wx.App(False)
-    frame = MainWindow(None, title='biwx', size=(810, 510))
-    frame.Show()
+    app = MyApp()
     app.MainLoop()
