@@ -194,11 +194,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         self.font_attr.SetTextColour(TEXT_COLOUR)
 
     def GetNumberRows(self):
-        needed_row = self.binary_length/32 + 1
-        if needed_row > 23:
-            return needed_row
-        else:
-            return 23
+        return 23
 
     def GetNumberCols(self):
         return 16
