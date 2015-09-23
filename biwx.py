@@ -5,7 +5,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
-import cProfile
+#import cProfile
 #from multiprocessing import Process
 
 
@@ -141,6 +141,8 @@ class ScrollBinder(object):
         try:
             if event.GetOrientation() != wx.VERTICAL or self._locked:
                 return
+
+            self._bound_widget.scroll_to(event.GetPosition())
 
         finally:
             event.Skip()
