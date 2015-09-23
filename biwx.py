@@ -5,6 +5,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
+import cProfile
 #from multiprocessing import Process
 
 
@@ -194,7 +195,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         self.font_attr.SetTextColour(TEXT_COLOUR)
 
     def GetNumberRows(self):
-        return 23
+        return 22
 
     def GetNumberCols(self):
         return 16
@@ -234,6 +235,10 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         attr.IncRef()
         return attr
 
+    def append_rows(self, number):
+        msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
+        self.GetView().ProcessTableMessage(msg)
+
 
 class HexGrid(wxgrid.Grid, ScrollBinder):
 
@@ -269,11 +274,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.font_attr.SetTextColour(TEXT_COLOUR)
 
     def GetNumberRows(self):
-        needed_row = self.binary_length/32 + 1
-        if needed_row > 23:
-            return needed_row
-        else:
-            return 23
+        return 22
 
     def GetNumberCols(self):
         return 16
@@ -310,6 +311,10 @@ class HexGridTable(wxgrid.PyGridTableBase):
         attr.IncRef()
         return attr
 
+    def append_rows(self, number):
+        msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
+        self.GetView().ProcessTableMessage(msg)
+
 
 class Editor(wx.Panel):
 
@@ -345,15 +350,21 @@ class Editor(wx.Panel):
     def load_file(self, file_path):
         try:
             new_binary = fy.get(file_path)
+            binary_length = len(new_binary)
+            added_rows = binary_length / 32 - 21
+
             self.hex_table.binary_data = new_binary
-            self.hex_table.binary_length = len(new_binary)
+            self.hex_table.binary_length = binary_length
+            self.hex_table.append_rows(added_rows)
             self.hex_grid.ForceRefresh()
 
             self.dump_table.binary_data = new_binary
-            self.dump_table.binary_length = len(new_binary)
+            self.dump_table.binary_length = binary_length
+            self.dump_table.append_rows(added_rows)
             self.dump_grid.ForceRefresh()
 
-        except:
+        except Exception, e:
+            print e
             message_box('Can not open file {0}.'.format(file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
 
 
@@ -422,3 +433,4 @@ class MyApp(wx.App):
 if __name__ == '__main__':
     app = MyApp()
     app.MainLoop()
+    #cProfile.run('app.MainLoop()')
