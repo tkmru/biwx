@@ -347,21 +347,24 @@ class Editor(wx.Panel):
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
+    def update_rows(self, new_binary):
+        binary_length = len(new_binary)
+        added_rows = binary_length / 32 - 21
+
+        self.hex_table.binary_data = new_binary
+        self.hex_table.binary_length = binary_length
+        self.hex_table.append_rows(added_rows)
+        self.hex_grid.ForceRefresh()
+
+        self.dump_table.binary_data = new_binary
+        self.dump_table.binary_length = binary_length
+        self.dump_table.append_rows(added_rows)
+        self.dump_grid.ForceRefresh()
+
     def load_file(self, file_path):
         try:
             new_binary = fy.get(file_path)
-            binary_length = len(new_binary)
-            added_rows = binary_length / 32 - 21
-
-            self.hex_table.binary_data = new_binary
-            self.hex_table.binary_length = binary_length
-            self.hex_table.append_rows(added_rows)
-            self.hex_grid.ForceRefresh()
-
-            self.dump_table.binary_data = new_binary
-            self.dump_table.binary_length = binary_length
-            self.dump_table.append_rows(added_rows)
-            self.dump_grid.ForceRefresh()
+            self.update_rows(new_binary)
 
         except Exception, e:
             print e
