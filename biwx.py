@@ -39,8 +39,8 @@ class ScrollBinder(object):
 
         self.Bind(wx.EVT_SCROLLWIN, self._did_scroll)
         self.Bind(wx.EVT_MOUSEWHEEL, self._mousewheel)
-        self.Bind(wx.EVT_SCROLLWIN_LINEUP, self._lineup)
-        self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self._linedown)
+        self.Bind(wx.EVT_SCROLLWIN_LINEUP, self._lineup_or_down)
+        self.Bind(wx.EVT_SCROLLWIN_LINEDOWN, self._lineup_or_down)
         self.Bind(wx.EVT_SCROLLWIN_PAGEUP, self._pageup)
         self.Bind(wx.EVT_SCROLLWIN_PAGEDOWN, self._pagedown)
         self.Bind(wx.EVT_SCROLLWIN_TOP, self._top)
@@ -55,17 +55,7 @@ class ScrollBinder(object):
 
     def _mousewheel(self, event):
         '''Mouse wheel scrolled. Up or down, give or take.'''
-        try:
-            if event.m_wheelRotation > 0:
-                do_scroll = self._lineup
-            else:
-                do_scroll = self._linedown
-
-            for r in range(event.m_linesPerAction):
-                do_scroll()
-
-        except AttributeError:
-            pass
+        self._lineup_or_down()
 
     def _pageup(self, event):
         '''Clicked on a scrollbar space, performing a page up.'''
@@ -116,25 +106,15 @@ class ScrollBinder(object):
         self._bound_widget.scroll_to(pos)
         self.scroll_to(pos)
 
-    def _lineup(self, event=None): # maybe wrong
-        '''Event handler for pressing the up arrow.'''
+    def _lineup_or_down(self, event=None):
+        '''Event handler for pressing the up arrow or the down arrow.'''
         if event and event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
 
-        pos = self.GetScrollPos(wx.VERTICAL)
-        self._bound_widget.scroll_to(pos)
-        self.scroll_to(pos)
-
-    def _linedown(self, event=None):
-        '''Event handler for pressing the down arrow.'''
-        if event and event.GetOrientation() != wx.VERTICAL:
-            event.Skip()
-            return
-
-        pos = self.GetScrollPos(wx.VERTICAL)
-        self.scroll_to(pos)
-        self._bound_widget.scroll_to(pos)
+        y_pos = self.GetViewStart()[1]
+        self._bound_widget.scroll_to(y_pos)
+        self.scroll_to(y_pos)
 
     def _did_scroll(self, event):
         '''Event handler for manual scrolling.'''
