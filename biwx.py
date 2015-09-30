@@ -255,6 +255,11 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
         self.font_attr.SetTextColour(TEXT_COLOUR)
 
+        attr = wx.grid.GridCellAttr()
+        attr.SetBackgroundColour("#FFFFCC")
+        attr.IncRef()
+        self.SetAttr(10, 10, attr)
+
     def GetNumberRows(self):
         return 22
 
@@ -306,10 +311,12 @@ class Editor(wx.Panel):
         self.hex_grid = HexGrid(self)
         self.hex_table = HexGridTable()
         self.hex_grid.SetTable(self.hex_table)
+        self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_selected_cell)
 
         self.dump_grid = DumpGrid(self)
         self.dump_table = DumpGridTable()
         self.dump_grid.SetTable(self.dump_table)
+        self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_selected_cell)
 
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
@@ -321,13 +328,24 @@ class Editor(wx.Panel):
         for i in range(0, 16):
             self.dump_grid.SetColSize(i, 15)
 
-        self.hex_grid.Refresh()
         self.dump_grid.Refresh()
+        self.hex_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=3)
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
+
+    def on_selected_cell(self, event):
+        """
+        Get the selection of a single cell by clicking or 
+        moving the selection with the arrow keys
+        """
+        selected_row = event.GetRow()
+        selected_col = event.GetCol()
+        print selected_row, selected_col
+
+        event.Skip()
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
