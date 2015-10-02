@@ -5,7 +5,6 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
-#import cProfile
 #from multiprocessing import Process
 
 
@@ -211,11 +210,12 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
-
+    '''
     def GetAttr(self, row, col, kind):
         attr = self.font_attr
         attr.IncRef()
         return attr
+    '''
 
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
@@ -255,11 +255,6 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
         self.font_attr.SetTextColour(TEXT_COLOUR)
 
-        attr = wx.grid.GridCellAttr()
-        attr.SetBackgroundColour("#FFFFCC")
-        attr.IncRef()
-        self.SetAttr(10, 10, attr)
-
     def GetNumberRows(self):
         return 22
 
@@ -292,12 +287,12 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
     def GetRowLabelValue(self, row):
         return '0x{0:0>6X}'.format(row * 16)
-
+    '''
     def GetAttr(self, row, col, kind):
         attr = self.font_attr
         attr.IncRef()
         return attr
-
+    '''
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
         self.GetView().ProcessTableMessage(msg)
@@ -307,6 +302,9 @@ class Editor(wx.Panel):
 
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
+
+        self.before_col = None
+        self.before_row = None
 
         self.hex_grid = HexGrid(self)
         self.hex_table = HexGridTable()
@@ -345,6 +343,19 @@ class Editor(wx.Panel):
         selected_col = event.GetCol()
         print selected_row, selected_col
 
+        if self.before_col is not None and self.before_row is not None:
+            old_attr = wxgrid.GridCellAttr()
+            old_attr.SetBackgroundColour("#FFFFFF")
+            old_attr.IncRef()
+            self.hex_table.SetAttr(old_attr, self.before_row, self.before_col)
+
+        attr = wxgrid.GridCellAttr()
+        attr.SetBackgroundColour("#FFFFCC")
+        attr.IncRef()
+        self.hex_table.SetAttr(attr, selected_row, selected_col)
+
+        #self.hex_grid.ForceRefresh()
+        print 'changed'
         event.Skip()
 
     def update_rows(self, new_binary):
@@ -436,4 +447,3 @@ class MyApp(wx.App):
 if __name__ == '__main__':
     app = MyApp()
     app.MainLoop()
-    #cProfile.run('app.MainLoop()')
