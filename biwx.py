@@ -210,12 +210,12 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
-    '''
+
     def GetAttr(self, row, col, kind):
         attr = self.font_attr
         attr.IncRef()
         return attr
-    '''
+
 
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
@@ -287,12 +287,12 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
     def GetRowLabelValue(self, row):
         return '0x{0:0>6X}'.format(row * 16)
-    '''
+
     def GetAttr(self, row, col, kind):
         attr = self.font_attr
         attr.IncRef()
         return attr
-    '''
+
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
         self.GetView().ProcessTableMessage(msg)
@@ -305,6 +305,7 @@ class Editor(wx.Panel):
 
         self.before_col = None
         self.before_row = None
+        self.binary_data = '57656c636f6d6520746f20626977782121'
 
         self.hex_grid = HexGrid(self)
         self.hex_table = HexGridTable()
@@ -376,6 +377,7 @@ class Editor(wx.Panel):
         try:
             new_binary = fy.get(file_path)
             self.update_rows(new_binary)
+            self.binary_data = new_binary
 
         except Exception, e:
             print e
@@ -399,13 +401,14 @@ class MainWindow(wx.Frame):
 
         file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
         file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
-        file_menu.Append(wx.ID_SAVE, '&Save')
+        file_menu.Append(wx.ID_SAVE, '&Save', 'Save current binary')
 
         # creating the menubar.
         menu_bar = wx.MenuBar()
         menu_bar.Append(file_menu, '&File')
         self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
         self.Connect(wx.ID_OPEN, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
+        self.Connect(wx.ID_SAVE, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.save_file)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = Editor(self)
@@ -428,6 +431,12 @@ class MainWindow(wx.Frame):
         print file_path
         self.editor.load_file(file_path)
         self.SetStatusText('Opened file "{0}".'.format(file_path))
+
+    def save_file(self, event):
+        file_path = self._file_dialog('Save a file', style=wx.SAVE)
+        print file_path
+        self.SetStatusText('Saved file "{0}".'.format(file_path))
+        print self.editor.binary_data
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
