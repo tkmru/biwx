@@ -433,10 +433,10 @@ class MainWindow(wx.Frame):
         self.SetStatusText('Opened file "{0}".'.format(file_path))
 
     def save_file(self, event):
-        file_path = self._file_dialog('Save a file', style=wx.SAVE)
-        print file_path
-        self.SetStatusText('Saved file "{0}".'.format(file_path))
-        print self.editor.binary_data
+        target_path = self._file_dialog('Save a file', style=wx.SAVE)
+        print target_path
+        self.SetStatusText('Saved file "{0}".'.format(target_path))
+        fy.write(target_path, self.editor.binary_data)
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
