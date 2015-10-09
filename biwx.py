@@ -144,6 +144,12 @@ class ScrollBinder(object):
         self._locked = False
 
 
+class BinaryResource(object):
+
+    def __init__(self):
+        self.data = '57656c636f6d6520746f20626977782121'
+
+
 class DumpGrid(wxgrid.Grid, ScrollBinder):
 
     def __init__(self, parent):
@@ -168,7 +174,9 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-        self.binary_data = '57656c636f6d6520746f20626977782121'
+
+        binary = BinaryResource()
+        self.binary_data = binary.data
         self.binary_length = len(self.binary_data)
 
         self.font_attr = wx.grid.GridCellAttr()
@@ -216,7 +224,6 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         attr.IncRef()
         return attr
 
-
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
         self.GetView().ProcessTableMessage(msg)
@@ -248,7 +255,9 @@ class HexGridTable(wxgrid.PyGridTableBase):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-        self.binary_data = '57656c636f6d6520746f20626977782121'
+
+        binary = BinaryResource()
+        self.binary_data = binary.data
         self.binary_length = len(self.binary_data)
 
         self.font_attr = wx.grid.GridCellAttr()
