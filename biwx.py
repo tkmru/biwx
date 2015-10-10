@@ -170,13 +170,12 @@ class DumpGrid(wxgrid.Grid, ScrollBinder):
 
 class DumpGridTable(wxgrid.PyGridTableBase):
 
-    def __init__(self):
+    def __init__(self, resource):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
-        binary = BinaryResource()
-        self.binary_data = binary.data
+        self.binary_data = resource.data
         self.binary_length = len(self.binary_data)
 
         self.font_attr = wx.grid.GridCellAttr()
@@ -251,13 +250,12 @@ class HexGrid(wxgrid.Grid, ScrollBinder):
 
 class HexGridTable(wxgrid.PyGridTableBase):
 
-    def __init__(self):
+    def __init__(self, resource):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
-        binary = BinaryResource()
-        self.binary_data = binary.data
+        self.binary_data = resource.data
         self.binary_length = len(self.binary_data)
 
         self.font_attr = wx.grid.GridCellAttr()
@@ -312,17 +310,18 @@ class Editor(wx.Panel):
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
 
+        self.resource = BinaryResource()
+
         self.before_col = None
         self.before_row = None
-        self.binary_data = '57656c636f6d6520746f20626977782121'
 
         self.hex_grid = HexGrid(self)
-        self.hex_table = HexGridTable()
+        self.hex_table = HexGridTable(self.resource)
         self.hex_grid.SetTable(self.hex_table)
         self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_selected_cell)
 
         self.dump_grid = DumpGrid(self)
-        self.dump_table = DumpGridTable()
+        self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
         self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_selected_cell)
 
@@ -386,7 +385,7 @@ class Editor(wx.Panel):
         try:
             new_binary = fy.get(file_path)
             self.update_rows(new_binary)
-            self.binary_data = new_binary
+            self.resource.data = new_binary
 
         except Exception, e:
             print e
@@ -445,7 +444,7 @@ class MainWindow(wx.Frame):
         target_path = self._file_dialog('Save a file', style=wx.SAVE)
         print target_path
         self.SetStatusText('Saved file "{0}".'.format(target_path))
-        fy.write(target_path, self.editor.binary_data)
+        fy.write(target_path, self.editor.resource.data)
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
