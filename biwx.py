@@ -283,11 +283,11 @@ class HexGridTable(wxgrid.PyGridTableBase):
     def SetValue(self, row, col, value): # change value
         address = row * 32 + col * 2
         if address <= self.binary_length:
-            self.binary_data = self.binary_data[:address] + value + self.binary_data[address+2:]
+            self.binary_data = self.binary_data[:address] + value[:2] + self.binary_data[address+2:]
 
         else:
             # not reflected
-            self.binary_data = self.binary_data + '00'*(address-self.binary_length) + value + self.binary_data[address+2:]
+            self.binary_data = self.binary_data + '00'*(address-self.binary_length) + value[:2] + self.binary_data[address+2:]
         print self.binary_data
 
     def GetColLabelValue(self, col):
@@ -445,7 +445,8 @@ class MainWindow(wx.Frame):
         target_path = self._file_dialog('Save a file', style=wx.SAVE)
         print target_path
         self.SetStatusText('Saved file "{0}".'.format(target_path))
-        fy.write(target_path, self.editor.resource.data)
+        print self.editor.resource.data
+        #fy.write(target_path, self.editor.resource.data)
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
