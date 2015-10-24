@@ -175,8 +175,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
-        self.binary_data = resource.data
-        self.binary_length = len(self.binary_data)
+        self.resource = resource
 
         self.font_attr = wx.grid.GridCellAttr()
         self.font_attr.SetFont(wx.Font(DUMP_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
@@ -193,8 +192,8 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
     def GetValue(self, row, col): # get initial value
         address = row * 32 + col*2
-        if address+2 <= self.binary_length:
-            ascii_number = int(self.binary_data[address: address+2], 16)
+        if address+2 <= len(self.resource.data):
+            ascii_number = int(self.resource.data[address: address+2], 16)
 
             if 0 <= ascii_number <= 32 or 127 <= ascii_number:
                 return '.'
@@ -208,13 +207,13 @@ class DumpGridTable(wxgrid.PyGridTableBase):
     def SetValue(self, row, col, value): # change value
         address = row * 32 + col * 2
         hex_value = '{0:2x}'.format(ord(value))
-        if address <= self.binary_length:
-            self.binary_data = self.binary_data[:address] + hex_value + self.binary_data[address+2:]
+        if address <= len(self.resource.data):
+            self.resource.data = self.resource.data[:address] + hex_value + self.resource.data[address+2:]
 
         else:
             # not reflected
-            self.binary_data = self.binary_data + '00'*(address-self.binary_length) + hex_value + self.binary_data[address+2:]
-        print self.binary_data
+            self.resource.data = self.resource.data + '00'*(address-len(self.resource.data)) + hex_value + self.resource.data[address+2:]
+        print self.resource.data
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -256,8 +255,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
-        self.binary_data = resource.data
-        self.binary_length = len(self.binary_data)
+        self.resource = resource
 
         self.font_attr = wx.grid.GridCellAttr()
         self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
@@ -274,21 +272,21 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
     def GetValue(self, row, col): # get initial value
         address = row * 32 + col * 2
-        if address+2 <= self.binary_length:
-            return self.binary_data[address: address+2]
+        if address+2 <= len(self.resource.data):
+            return self.resource.data[address: address+2]
 
         else:
             return ''
 
     def SetValue(self, row, col, value): # change value
         address = row * 32 + col * 2
-        if address <= self.binary_length:
-            self.binary_data = self.binary_data[:address] + value[:2] + self.binary_data[address+2:]
+        if address <= len(self.resource.data):
+            self.resource.data = self.resource.data[:address] + value[:2] + self.resource.data[address+2:]
 
         else:
             # not reflected
-            self.binary_data = self.binary_data + '00'*(address-self.binary_length) + value[:2] + self.binary_data[address+2:]
-        print self.binary_data
+            self.resource.data = self.resource.data + '00'*(address-len(self.resource.data)) + value[:2] + self.resource.data[address+2:]
+        print self.resource.data
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -446,7 +444,7 @@ class MainWindow(wx.Frame):
         print target_path
         self.SetStatusText('Saved file "{0}".'.format(target_path))
         print self.editor.resource.data
-        #fy.write(target_path, self.editor.resource.data)
+        fy.write(target_path, self.editor.resource.data)
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
