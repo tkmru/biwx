@@ -206,14 +206,15 @@ class DumpGridTable(wxgrid.PyGridTableBase):
             return ''
 
     def SetValue(self, row, col, value): # change value
-        try:
-            self.binary_data[row][col] = value
+        address = row * 32 + col * 2
+        hex_value = '{0:2x}'.format(ord(value))
+        if address <= self.binary_length:
+            self.binary_data = self.binary_data[:address] + hex_value + self.binary_data[address+2:]
 
-        except IndexError:
-            for i in range(row - len(self.binary_data) + 1):
-                self.binary_data.append(['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
-
-            self.binary_data[row][col] = value
+        else:
+            # not reflected
+            self.binary_data = self.binary_data + '00'*(address-self.binary_length) + hex_value + self.binary_data[address+2:]
+        print self.binary_data
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -287,7 +288,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         else:
             # not reflected
             self.binary_data = self.binary_data + '00'*(address-self.binary_length) + value + self.binary_data[address+2:]
-            print self.binary_data
+        print self.binary_data
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
