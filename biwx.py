@@ -272,7 +272,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         return False
 
     def GetValue(self, row, col): # get initial value
-        address = row * 32 + col*2
+        address = row * 32 + col * 2
         if address+2 <= self.binary_length:
             return self.binary_data[address: address+2]
 
@@ -280,14 +280,14 @@ class HexGridTable(wxgrid.PyGridTableBase):
             return ''
 
     def SetValue(self, row, col, value): # change value
-        try:
-            self.binary_data[row][col] = value
+        address = row * 32 + col * 2
+        if address <= self.binary_length:
+            self.binary_data = self.binary_data[:address] + value + self.binary_data[address+2:]
 
-        except IndexError:
-            for i in range(row - len(self.binary_data) + 1):
-                self.binary_data.append(['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
-
-            self.binary_data[row][col] = value
+        else:
+            # not reflected
+            self.binary_data = self.binary_data + '00'*(address-self.binary_length) + value + self.binary_data[address+2:]
+            print self.binary_data
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -363,8 +363,8 @@ class Editor(wx.Panel):
         attr.IncRef()
         self.hex_table.SetAttr(attr, selected_row, selected_col)
 
-        #self.hex_grid.ForceRefresh()
-        print 'changed'
+        self.hex_grid.ForceRefresh()
+        print 'selected'
         event.Skip()
 
     def update_rows(self, new_binary):
