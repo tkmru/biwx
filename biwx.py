@@ -362,7 +362,9 @@ class Editor(wx.Panel):
         attr.IncRef()
         self.hex_table.SetAttr(attr, selected_row, selected_col)
 
-        self.hex_grid.ForceRefresh()
+        self.hex_grid.ForceRefresh() # for being reflected edited data
+        self.dump_grid.ForceRefresh() # for being reflected edited data
+
         print 'selected'
         event.Skip()
 
