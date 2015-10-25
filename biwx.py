@@ -144,10 +144,10 @@ class ScrollBinder(object):
         self._locked = False
 
 
-class BinaryResource(object):
+class Resource(object):
 
     def __init__(self):
-        self.data = '57656c636f6d6520746f20626977782121'
+        self.binary = '57656c636f6d6520746f20626977782121'
 
 
 class DumpGrid(wxgrid.Grid, ScrollBinder):
@@ -192,8 +192,8 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
     def GetValue(self, row, col): # get initial value
         address = row * 32 + col*2
-        if address+2 <= len(self.resource.data):
-            ascii_number = int(self.resource.data[address: address+2], 16)
+        if address+2 <= len(self.resource.binary):
+            ascii_number = int(self.resource.binary[address: address+2], 16)
 
             if 0 <= ascii_number <= 32 or 127 <= ascii_number:
                 return '.'
@@ -206,14 +206,14 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
     def SetValue(self, row, col, value): # change value
         address = row * 32 + col * 2
-        hex_value = '{0:2x}'.format(ord(value))
-        if address <= len(self.resource.data):
-            self.resource.data = self.resource.data[:address] + hex_value + self.resource.data[address+2:]
+        hex_value = '{0:2x}'.format(ord(value[0])) # 1 char only
+        if address <= len(self.resource.binary):
+            self.resource.binary = self.resource.binary[:address] + hex_value + self.resource.binary[address+2:]
 
         else:
             # not reflected
-            self.resource.data = self.resource.data + '00'*(address-len(self.resource.data)) + hex_value + self.resource.data[address+2:]
-        print self.resource.data
+            self.resource.binary = self.resource.binary + '00'*(address-len(self.resource.binary)) + hex_value + self.resource.binary[address+2:]
+        print self.resource.binary
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -272,21 +272,21 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
     def GetValue(self, row, col): # get initial value
         address = row * 32 + col * 2
-        if address+2 <= len(self.resource.data):
-            return self.resource.data[address: address+2]
+        if address+2 <= len(self.resource.binary):
+            return self.resource.binary[address: address+2]
 
         else:
             return ''
 
     def SetValue(self, row, col, value): # change value
         address = row * 32 + col * 2
-        if address <= len(self.resource.data):
-            self.resource.data = self.resource.data[:address] + value[:2] + self.resource.data[address+2:]
+        if address <= len(self.resource.binary):
+            self.resource.binary = self.resource.binary[:address] + value[:2] + self.resource.binary[address+2:]
 
         else:
             # not reflected
-            self.resource.data = self.resource.data + '00'*(address-len(self.resource.data)) + value[:2] + self.resource.data[address+2:]
-        print self.resource.data
+            self.resource.binary = self.resource.binary + '00'*(address-len(self.resource.binary)) + value[:2] + self.resource.binary[address+2:]
+        print self.resource.binary
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -309,7 +309,7 @@ class Editor(wx.Panel):
     def __init__(self, *args, **kwags):
         wx.Panel.__init__(self, *args, **kwags)
 
-        self.resource = BinaryResource()
+        self.resource = Resource()
 
         self.before_col = None
         self.before_row = None
@@ -384,7 +384,7 @@ class Editor(wx.Panel):
         try:
             new_binary = fy.get(file_path)
             self.update_rows(new_binary)
-            self.resource.data = new_binary
+            self.resource.binary = new_binary
 
         except Exception, e:
             print e
@@ -443,8 +443,8 @@ class MainWindow(wx.Frame):
         target_path = self._file_dialog('Save a file', style=wx.SAVE)
         print target_path
         self.SetStatusText('Saved file "{0}".'.format(target_path))
-        print self.editor.resource.data
-        fy.write(target_path, self.editor.resource.data)
+        print self.editor.resource.binary
+        fy.write(target_path, self.editor.resource.binary)
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
