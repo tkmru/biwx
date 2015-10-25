@@ -149,6 +149,15 @@ class Resource(object):
     def __init__(self):
         self.binary = '57656c636f6d6520746f20626977782121'
 
+    def insert(self, row, col, hex_value):
+        address = row * 32 + col * 2
+        if address <= len(self.binary):
+            self.binary = self.binary[:address] + hex_value + self.binary[address+2:]
+
+        else:
+            # not reflected
+            self.binary = self.binary + '00'*(address-len(self.binary)) + hex_value + self.binary[address+2:]
+
 
 class DumpGrid(wxgrid.Grid, ScrollBinder):
 
@@ -205,15 +214,8 @@ class DumpGridTable(wxgrid.PyGridTableBase):
             return ''
 
     def SetValue(self, row, col, value): # change value
-        address = row * 32 + col * 2
         hex_value = '{0:2x}'.format(ord(value[0])) # 1 char only
-        if address <= len(self.resource.binary):
-            self.resource.binary = self.resource.binary[:address] + hex_value + self.resource.binary[address+2:]
-
-        else:
-            # not reflected
-            self.resource.binary = self.resource.binary + '00'*(address-len(self.resource.binary)) + hex_value + self.resource.binary[address+2:]
-        print self.resource.binary
+        self.resource.insert(row, col, hex_value)
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
@@ -278,15 +280,8 @@ class HexGridTable(wxgrid.PyGridTableBase):
         else:
             return ''
 
-    def SetValue(self, row, col, value): # change value
-        address = row * 32 + col * 2
-        if address <= len(self.resource.binary):
-            self.resource.binary = self.resource.binary[:address] + value[:2] + self.resource.binary[address+2:]
-
-        else:
-            # not reflected
-            self.resource.binary = self.resource.binary + '00'*(address-len(self.resource.binary)) + value[:2] + self.resource.binary[address+2:]
-        print self.resource.binary
+    def SetValue(self, row, col, hex_value): # change value
+        self.resource.insert(row, col, hex_value)
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
