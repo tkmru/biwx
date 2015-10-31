@@ -5,7 +5,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
-#from multiprocessing import Process
+# from multiprocessing import Process
 
 
 GRID_LINE_COLOUR = '#e7daf7'
@@ -312,12 +312,14 @@ class Editor(wx.Panel):
         self.hex_grid = HexGrid(self)
         self.hex_table = HexGridTable(self.resource)
         self.hex_grid.SetTable(self.hex_table)
-        self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_selected_cell)
+        self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
+        self.hex_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         self.dump_grid = DumpGrid(self)
         self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
-        self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_selected_cell)
+        self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
+        self.dump_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
@@ -337,7 +339,14 @@ class Editor(wx.Panel):
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
 
-    def on_selected_cell(self, event):
+    def on_cell_changed(self, event):
+        self.hex_grid.ForceRefresh() # for being reflected edited data
+        self.dump_grid.ForceRefresh() # for being reflected edited data
+
+        print 'changed'
+        event.Skip()
+
+    def on_cell_selected(self, event):
         """
         Get the selection of a single cell by clicking or 
         moving the selection with the arrow keys
@@ -356,9 +365,6 @@ class Editor(wx.Panel):
         attr.SetBackgroundColour("#FFFFCC")
         attr.IncRef()
         self.hex_table.SetAttr(attr, selected_row, selected_col)
-
-        self.hex_grid.ForceRefresh() # for being reflected edited data
-        self.dump_grid.ForceRefresh() # for being reflected edited data
 
         print 'selected'
         event.Skip()
