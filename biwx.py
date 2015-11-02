@@ -5,6 +5,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
+import random
 # from multiprocessing import Process
 
 
@@ -186,9 +187,11 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
         self.resource = resource
 
+        '''
         self.font_attr = wx.grid.GridCellAttr()
         self.font_attr.SetFont(wx.Font(DUMP_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
         self.font_attr.SetTextColour(TEXT_COLOUR)
+        '''
 
     def GetNumberRows(self):
         return 22
@@ -220,10 +223,12 @@ class DumpGridTable(wxgrid.PyGridTableBase):
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
 
+    '''
     def GetAttr(self, row, col, kind):
         attr = self.font_attr
         attr.IncRef()
         return attr
+    '''
 
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
@@ -258,10 +263,11 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
         self.resource = resource
-
+        '''
         self.font_attr = wx.grid.GridCellAttr()
         self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
         self.font_attr.SetTextColour(TEXT_COLOUR)
+        '''
 
     def GetNumberRows(self):
         return 22
@@ -289,10 +295,15 @@ class HexGridTable(wxgrid.PyGridTableBase):
     def GetRowLabelValue(self, row):
         return '0x{0:0>6X}'.format(row * 16)
 
+    '''
     def GetAttr(self, row, col, kind):
+        self.font_attr = wx.grid.GridCellAttr()
+        self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
+        self.font_attr.SetTextColour(TEXT_COLOUR)
         attr = self.font_attr
         attr.IncRef()
         return attr
+    '''
 
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
@@ -319,7 +330,7 @@ class Editor(wx.Panel):
         self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
         self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
-        self.dump_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
+        self.dump_grid.Bind(wxgrid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
@@ -340,8 +351,8 @@ class Editor(wx.Panel):
         self.SetSizerAndFit(sizer)
 
     def on_cell_changed(self, event):
-        self.hex_grid.ForceRefresh() # for being reflected edited data
-        self.dump_grid.ForceRefresh() # for being reflected edited data
+        #self.hex_grid.ForceRefresh() # for being reflected edited data
+        #self.dump_grid.ForceRefresh() # for being reflected edited data
 
         print 'changed'
         event.Skip()
@@ -351,23 +362,22 @@ class Editor(wx.Panel):
         Get the selection of a single cell by clicking or 
         moving the selection with the arrow keys
         """
+
         selected_row = event.GetRow()
         selected_col = event.GetCol()
         print selected_row, selected_col
 
-        if self.before_col is not None and self.before_row is not None:
-            old_attr = wxgrid.GridCellAttr()
-            old_attr.SetBackgroundColour("#FFFFFF")
-            old_attr.IncRef()
-            self.hex_table.SetAttr(old_attr, self.before_row, self.before_col)
-
-        attr = wxgrid.GridCellAttr()
-        attr.SetBackgroundColour("#FFFFCC")
-        attr.IncRef()
-        self.hex_table.SetAttr(attr, selected_row, selected_col)
-
+        #attr = wxgrid.GridCellAttr()
+        
+        attr = self.hex_grid.GetOrCreateCellAttr(selected_row, selected_col)
+        print attr
+        attr.SetBackgroundColour(random.choice(['yellow', 'red','black']))
+        self.hex_table.SetAttr(selected_row, selected_col, attr)
+        
+        self.hex_grid.ForceRefresh()
         print 'selected'
         event.Skip()
+
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
