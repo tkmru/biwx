@@ -5,7 +5,6 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
-import random
 # from multiprocessing import Process
 
 
@@ -184,14 +183,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-
         self.resource = resource
-
-        '''
-        self.font_attr = wx.grid.GridCellAttr()
-        self.font_attr.SetFont(wx.Font(DUMP_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
-        self.font_attr.SetTextColour(TEXT_COLOUR)
-        '''
 
     def GetNumberRows(self):
         return 22
@@ -222,13 +214,6 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 
     def GetColLabelValue(self, col):
         return self.cols_labels[col]
-
-    '''
-    def GetAttr(self, row, col, kind):
-        attr = self.font_attr
-        attr.IncRef()
-        return attr
-    '''
 
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
@@ -261,13 +246,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         wxgrid.PyGridTableBase.__init__(self)
 
         self.cols_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
-
         self.resource = resource
-        '''
-        self.font_attr = wx.grid.GridCellAttr()
-        self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
-        self.font_attr.SetTextColour(TEXT_COLOUR)
-        '''
 
     def GetNumberRows(self):
         return 22
@@ -294,16 +273,6 @@ class HexGridTable(wxgrid.PyGridTableBase):
 
     def GetRowLabelValue(self, row):
         return '0x{0:0>6X}'.format(row * 16)
-
-    '''
-    def GetAttr(self, row, col, kind):
-        self.font_attr = wx.grid.GridCellAttr()
-        self.font_attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
-        self.font_attr.SetTextColour(TEXT_COLOUR)
-        attr = self.font_attr
-        attr.IncRef()
-        return attr
-    '''
 
     def append_rows(self, number):
         msg = wxgrid.GridTableMessage(self, wxgrid.GRIDTABLE_NOTIFY_ROWS_APPENDED, number)
@@ -342,6 +311,8 @@ class Editor(wx.Panel):
         for i in range(0, 16):
             self.dump_grid.SetColSize(i, 15)
 
+        self.change_cell_color()
+
         self.dump_grid.Refresh()
         self.hex_grid.Refresh()
 
@@ -351,8 +322,8 @@ class Editor(wx.Panel):
         self.SetSizerAndFit(sizer)
 
     def on_cell_changed(self, event):
-        #self.hex_grid.ForceRefresh() # for being reflected edited data
-        #self.dump_grid.ForceRefresh() # for being reflected edited data
+        self.hex_grid.ForceRefresh() # for being reflected edited data
+        self.dump_grid.ForceRefresh() # for being reflected edited data
 
         print 'changed'
         event.Skip()
@@ -365,19 +336,26 @@ class Editor(wx.Panel):
 
         selected_row = event.GetRow()
         selected_col = event.GetCol()
-        print selected_row, selected_col
 
-        #attr = wxgrid.GridCellAttr()
-        
-        attr = self.hex_grid.GetOrCreateCellAttr(selected_row, selected_col)
-        print attr
-        attr.SetBackgroundColour(random.choice(['yellow', 'red','black']))
-        self.hex_table.SetAttr(selected_row, selected_col, attr)
-        
-        self.hex_grid.ForceRefresh()
+        print selected_row, selected_col
         print 'selected'
+
         event.Skip()
 
+    def change_cell_color(self):
+        for x in range(0, 16):
+            for y in range(0, 10):
+                attr = self.hex_grid.GetOrCreateCellAttr(y, x)
+                attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
+                attr.SetTextColour(TEXT_COLOUR)
+                attr.SetBackgroundColour('yellow')
+                self.hex_table.SetAttr(attr, y, x)
+
+                attr = self.dump_grid.GetOrCreateCellAttr(y, x)
+                attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
+                attr.SetTextColour(TEXT_COLOUR)
+                attr.SetBackgroundColour('yellow')
+                self.dump_table.SetAttr(attr, y, x)
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
