@@ -311,7 +311,7 @@ class Editor(wx.Panel):
         for i in range(0, 16):
             self.dump_grid.SetColSize(i, 15)
 
-        self.change_cell_color()
+        #self.change_cell_color()
 
         self.dump_grid.Refresh()
         self.hex_grid.Refresh()
@@ -342,24 +342,19 @@ class Editor(wx.Panel):
 
         event.Skip()
 
-    def change_cell_color(self):
-        for x in range(0, 16):
-            for y in range(0, 10):
-                attr = self.hex_grid.GetOrCreateCellAttr(y, x)
-                attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
-                attr.SetTextColour(TEXT_COLOUR)
-                attr.SetBackgroundColour('yellow')
-                self.hex_table.SetAttr(attr, y, x)
+    def change_cell_color(self, row, col, color):
+        attr = self.hex_grid.GetOrCreateCellAttr(row, col)
+        attr.SetBackgroundColour(color)
+        self.hex_table.SetAttr(attr, row, col)
 
-                attr = self.dump_grid.GetOrCreateCellAttr(y, x)
-                attr.SetFont(wx.Font(HEX_FONT_SIZE,  wx.DEFAULT, wx.NORMAL, wx.LIGHT, encoding=wx.FONTENCODING_SYSTEM))
-                attr.SetTextColour(TEXT_COLOUR)
-                attr.SetBackgroundColour('yellow')
-                self.dump_table.SetAttr(attr, y, x)
+        attr = self.dump_grid.GetOrCreateCellAttr(row, col)
+        attr.SetBackgroundColour(color)
+        self.dump_table.SetAttr(attr, row, col)
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
-        added_rows = binary_length / 32 - 21
+        rows_number = binary_length / 32
+        added_rows = rows_number - 21
 
         self.hex_table.binary_data = new_binary
         self.hex_table.binary_length = binary_length
