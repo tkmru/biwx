@@ -286,8 +286,10 @@ class Editor(wx.Panel):
 
         self.resource = Resource()
 
-        self.before_col = None
-        self.before_row = None
+        self.selected_flag = 0
+        self.old_selected_row = None
+        self.old_selected_col = None
+        self.old_selected_cell_color = None
 
         self.hex_grid = HexGrid(self)
         self.hex_table = HexGridTable(self.resource)
@@ -299,7 +301,7 @@ class Editor(wx.Panel):
         self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
         self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
-        self.dump_grid.Bind(wxgrid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
+        # self.dump_grid.Bind(wxgrid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
@@ -334,8 +336,13 @@ class Editor(wx.Panel):
 
         selected_row = event.GetRow()
         selected_col = event.GetCol()
+        self.old_selected_row = selected_row
+        self.old_selected_col = selected_col
+        self.old_selected_cell_color.hex_grid.GetOrCreateCellAttr(selected_row, selected_col).GetBackgroundColour()
 
-        print selected_row, selected_col
+        self.change_cell_color(selected_row, selected_col, 'blue')
+        self.hex_grid.ForceRefresh() # for being reflected edited data
+        self.dump_grid.ForceRefresh() # for being reflected edited data
         print 'selected'
 
         event.Skip()
