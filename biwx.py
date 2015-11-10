@@ -333,14 +333,19 @@ class Editor(wx.Panel):
         Get the selection of a single cell by clicking or 
         moving the selection with the arrow keys
         """
+        if self.selected_flag == 1:
+            self.change_cell_color(self.old_selected_row, self.old_selected_col, self.old_selected_cell_color)
+        self.selected_flag = 1
 
         selected_row = event.GetRow()
         selected_col = event.GetCol()
+
         self.old_selected_row = selected_row
         self.old_selected_col = selected_col
-        self.old_selected_cell_color.hex_grid.GetOrCreateCellAttr(selected_row, selected_col).GetBackgroundColour()
+        self.old_selected_cell_color = self.hex_grid.GetOrCreateCellAttr(selected_row, selected_col).GetBackgroundColour()
 
         self.change_cell_color(selected_row, selected_col, 'blue')
+
         self.hex_grid.ForceRefresh() # for being reflected edited data
         self.dump_grid.ForceRefresh() # for being reflected edited data
         print 'selected'
