@@ -10,7 +10,8 @@ import fy
 
 GRID_LINE_COLOUR = '#e7daf7'
 BACKGROUND_COLOUR = '#e8e8e8'
-TEXT_COLOUR = '#252525'
+SELECTED_CELL_COLOUR = '#aff0fa'
+FILE_SIGNATURE_COLOUR = '#ffe792'
 
 ROW_SIZE = 20
 ROW_LABEL_SIZE = 70
@@ -344,7 +345,7 @@ class Editor(wx.Panel):
         self.old_selected_col = selected_col
         self.old_selected_cell_color = self.hex_grid.GetOrCreateCellAttr(selected_row, selected_col).GetBackgroundColour()
 
-        self.change_cell_color(selected_row, selected_col, 'blue')
+        self.change_cell_color(selected_row, selected_col, SELECTED_CELL_COLOUR)
 
         self.hex_grid.ForceRefresh() # for being reflected edited data
         self.dump_grid.ForceRefresh() # for being reflected edited data
@@ -365,12 +366,12 @@ class Editor(wx.Panel):
         for file_type, indexies in fy.get_signature_index(binary, fy.headers).items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
-                    self.change_cell_color(i/16, i % 16, 'yellow')
+                    self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
 
         for file_type, indexies in fy.get_signature_index(binary, fy.footers).items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
-                    self.change_cell_color(i/16, i % 16, 'yellow')
+                    self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
