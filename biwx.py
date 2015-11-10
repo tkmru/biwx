@@ -311,8 +311,6 @@ class Editor(wx.Panel):
         for i in range(0, 16):
             self.dump_grid.SetColSize(i, 15)
 
-        #self.change_cell_color()
-
         self.dump_grid.Refresh()
         self.hex_grid.Refresh()
 
@@ -351,6 +349,17 @@ class Editor(wx.Panel):
         attr.SetBackgroundColour(color)
         self.dump_table.SetAttr(attr, row, col)
 
+    def find_signature(self, binary):
+        for file_type, indexies in fy.get_signature_index(binary, fy.headers).items():
+            for index in indexies:
+                for i in range(index[0]/2, (index[1]+1)/2):
+                    self.change_cell_color(i/16, i % 16, 'yellow')
+
+        for file_type, indexies in fy.get_signature_index(binary, fy.footers).items():
+            for index in indexies:
+                for i in range(index[0]/2, (index[1]+1)/2):
+                    self.change_cell_color(i/16, i % 16, 'yellow')
+
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
         rows_number = binary_length / 32
@@ -371,6 +380,7 @@ class Editor(wx.Panel):
             new_binary = fy.get(file_path)
             self.update_rows(new_binary)
             self.resource.binary = new_binary
+            self.find_signature(new_binary)
 
         except Exception, e:
             print e
