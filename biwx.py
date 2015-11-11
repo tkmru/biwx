@@ -363,6 +363,12 @@ class Editor(wx.Panel):
         self.dump_table.SetAttr(attr, row, col)
 
     def find_signature(self, binary):
+        selected_cell = None
+        if self.selected_flag == 1:
+            # save selected cell color before change
+            selected_cell = self.hex_grid.GetOrCreateCellAttr(self.old_selected_row, self.old_selected_col)
+            selected_cell_color = selected_cell.GetBackgroundColour()
+
         for file_type, indexies in fy.get_signature_index(binary, fy.headers).items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
@@ -372,6 +378,13 @@ class Editor(wx.Panel):
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
                     self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
+
+        if self.selected_flag == 1:
+            # restore selected cell color after change
+            changed_selected_cell_color = selected_cell.GetBackgroundColour()
+            if changed_selected_cell_color != (255, 255, 255):
+                self.old_selected_cell_color = selected_cell.GetBackgroundColour() # update because cell color change
+            self.change_cell_color(self.old_selected_row, self.old_selected_col, selected_cell_color)
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
