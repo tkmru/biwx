@@ -459,6 +459,7 @@ class MainWindow(wx.Frame):
         file_path = self._file_dialog('Load a file', style=wx.OPEN)
         print file_path
         self.editor.load_file(file_path)
+        self.SetTitle(file_path)
         self.SetStatusText('Opened file "{0}".'.format(file_path))
 
     def save_file(self, event):
