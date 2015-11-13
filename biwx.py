@@ -296,17 +296,31 @@ class Editor(wx.Panel):
         self.hex_table = HexGridTable(self.resource)
         self.hex_grid.SetTable(self.hex_table)
         self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
-        self.hex_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
+        self.hex_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.on_hex_grid_right_click)
+        # self.hex_grid.GetGridWindow().Bind(wx.EVT_MOTION, self.on_mouse_over)
+        # self.hex_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         self.dump_grid = DumpGrid(self)
         self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
         self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
+        self.dump_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.on_dump_grid_right_click)
+        # self.dump_grid.GetGridWindow().Bind(wx.EVT_MOTION, self.on_mouse_over)
         # self.dump_grid.Bind(wxgrid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
         self.dump_grid.bind_scroll(self.hex_grid)
+
+        self.popupmenu = wx.Menu()
+        item = self.popupmenu.Append(-1, 'Copy hex')
+        self.Bind(wx.EVT_MENU, self.on_popup_selected, item)
+        item = self.popupmenu.Append(-1, 'Copy ascii')
+        self.Bind(wx.EVT_MENU, self.on_popup_selected, item)
+        item = self.popupmenu.Append(-1, 'Hex')
+        item = self.popupmenu.Append(-1, 'Decimal')
+        item = self.popupmenu.Append(-1, 'Binary')
+        item = self.popupmenu.Append(-1, 'Ascii')
 
         for i in range(0, 16):
             self.hex_grid.SetColSize(i, 30)
@@ -321,6 +335,29 @@ class Editor(wx.Panel):
         sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=3)
         sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
         self.SetSizerAndFit(sizer)
+
+    def on_popup_selected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        wx.MessageBox("You selected item '%s'" % text)
+
+    def on_hex_grid_right_click(self, event):
+        print 'right click'
+        # event.GetEventObject
+        pos = event.GetPosition()
+        self.hex_grid.PopupMenu(self.popupmenu, (pos[0]+90, pos[1]+50))
+        event.Skip()
+
+    def on_dump_grid_right_click(self, event):
+        print 'right click'
+        # event.GetEventObject
+        pos = event.GetPosition()
+        self.dump_grid.PopupMenu(self.popupmenu, (pos[0]+14, pos[1]+50))
+        event.Skip()
+
+    def on_mouse_over(self, event):
+        print 'mouse over'
+        event.Skip()
 
     def on_cell_changed(self, event):
         self.hex_grid.ForceRefresh() # for being reflected edited data
