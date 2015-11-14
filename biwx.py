@@ -296,7 +296,7 @@ class Editor(wx.Panel):
         self.hex_table = HexGridTable(self.resource)
         self.hex_grid.SetTable(self.hex_table)
         self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
-        self.hex_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.on_hex_grid_right_click)
+        self.hex_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.show_popup_on_hex_grid)
         # self.hex_grid.GetGridWindow().Bind(wx.EVT_MOTION, self.on_mouse_over)
         # self.hex_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
@@ -304,7 +304,7 @@ class Editor(wx.Panel):
         self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
         self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
-        self.dump_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.on_dump_grid_right_click)
+        self.dump_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.show_popup_on_dump_grid)
         # self.dump_grid.GetGridWindow().Bind(wx.EVT_MOTION, self.on_mouse_over)
         # self.dump_grid.Bind(wxgrid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
@@ -312,15 +312,20 @@ class Editor(wx.Panel):
         self.hex_grid.bind_scroll(self.dump_grid)
         self.dump_grid.bind_scroll(self.hex_grid)
 
+
         self.popupmenu = wx.Menu()
-        item = self.popupmenu.Append(-1, 'Copy hex')
+        item = self.popupmenu.Append(wx.ID_ANY, 'Copy hex')
         self.Bind(wx.EVT_MENU, self.on_popup_selected, item)
-        item = self.popupmenu.Append(-1, 'Copy ascii')
+        item = self.popupmenu.Append(wx.ID_ANY, 'Copy ascii')
         self.Bind(wx.EVT_MENU, self.on_popup_selected, item)
-        item = self.popupmenu.Append(-1, 'Hex')
-        item = self.popupmenu.Append(-1, 'Decimal')
-        item = self.popupmenu.Append(-1, 'Binary')
-        item = self.popupmenu.Append(-1, 'Ascii')
+        self.ID_HEX = wx.NewId()
+        self.popupmenu.Append(self.ID_HEX, 'Hex')
+        self.ID_DECIMAL = wx.NewId()
+        self.popupmenu.Append(self.ID_DECIMAL, 'Decimal')
+        self.ID_BINARY = wx.NewId()
+        self.popupmenu.Append(self.ID_BINARY, 'Binary')
+        self.ID_ASCII = wx.NewId()
+        self.popupmenu.Append(self.ID_ASCII, 'Ascii')
 
         for i in range(0, 16):
             self.hex_grid.SetColSize(i, 30)
@@ -341,15 +346,21 @@ class Editor(wx.Panel):
         text = item.GetText()
         wx.MessageBox("You selected item '%s'" % text)
 
-    def on_hex_grid_right_click(self, event):
-        print 'right click'
+    def show_popup_on_hex_grid(self, event):
         # event.GetEventObject
         pos = event.GetPosition()
+        self.popupmenu.Remove(self.ID_HEX)
+        self.popupmenu.Remove(self.ID_DECIMAL)
+        self.popupmenu.Remove(self.ID_BINARY)
+        self.popupmenu.Remove(self.ID_ASCII)
+        self.popupmenu.Append(self.ID_HEX, 'Hex 111')
+        self.popupmenu.Append(self.ID_DECIMAL, 'Decimal 111')
+        self.popupmenu.Append(self.ID_BINARY, 'Binary 111')
+        self.popupmenu.Append(self.ID_ASCII, 'Ascii 111')
         self.hex_grid.PopupMenu(self.popupmenu, (pos[0]+90, pos[1]+50))
         event.Skip()
 
-    def on_dump_grid_right_click(self, event):
-        print 'right click'
+    def show_popup_on_dump_grid(self, event):
         # event.GetEventObject
         pos = event.GetPosition()
         self.dump_grid.PopupMenu(self.popupmenu, (pos[0]+14, pos[1]+50))
