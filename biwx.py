@@ -346,22 +346,29 @@ class Editor(wx.Panel):
         text = item.GetText()
         wx.MessageBox("You selected item '%s'" % text)
 
-    def show_popup_on_hex_grid(self, event):
-        # event.GetEventObject
-        pos = event.GetPosition()
+    def make_popup(self):
         self.popupmenu.Remove(self.ID_HEX)
         self.popupmenu.Remove(self.ID_DECIMAL)
         self.popupmenu.Remove(self.ID_BINARY)
         self.popupmenu.Remove(self.ID_ASCII)
-        self.popupmenu.Append(self.ID_HEX, 'Hex 111')
-        self.popupmenu.Append(self.ID_DECIMAL, 'Decimal 111')
-        self.popupmenu.Append(self.ID_BINARY, 'Binary 111')
-        self.popupmenu.Append(self.ID_ASCII, 'Ascii 111')
+
+        cell_hex = self.hex_grid.GetCellValue(self.old_selected_row, self.old_selected_col)
+        cell_decimal = int(cell_hex, 16)
+        self.popupmenu.Append(self.ID_HEX, 'Hex: 0x'+cell_hex)
+        self.popupmenu.Append(self.ID_BINARY, 'Binary: '+str(bin(cell_decimal)))
+        self.popupmenu.Append(self.ID_DECIMAL, 'Decimal: '+str(cell_decimal))
+        self.popupmenu.Append(self.ID_ASCII, 'Ascii: '+chr(cell_decimal))
+
+    def show_popup_on_hex_grid(self, event):
+        # event.GetEventObject
+        self.make_popup()
+        pos = event.GetPosition()
         self.hex_grid.PopupMenu(self.popupmenu, (pos[0]+90, pos[1]+50))
         event.Skip()
 
     def show_popup_on_dump_grid(self, event):
         # event.GetEventObject
+        self.make_popup()
         pos = event.GetPosition()
         self.dump_grid.PopupMenu(self.popupmenu, (pos[0]+14, pos[1]+50))
         event.Skip()
