@@ -353,11 +353,22 @@ class Editor(wx.Panel):
         self.popupmenu.Remove(self.ID_ASCII)
 
         cell_hex = self.hex_grid.GetCellValue(self.old_selected_row, self.old_selected_col)
-        cell_decimal = int(cell_hex, 16)
-        self.popupmenu.Append(self.ID_HEX, 'Hex: 0x'+cell_hex)
-        self.popupmenu.Append(self.ID_BINARY, 'Binary: '+str(bin(cell_decimal)))
-        self.popupmenu.Append(self.ID_DECIMAL, 'Decimal: '+str(cell_decimal))
-        self.popupmenu.Append(self.ID_ASCII, 'Ascii: '+chr(cell_decimal))
+        if cell_hex == '':
+            self.popupmenu.Append(self.ID_HEX, 'Hex: ')
+            self.popupmenu.Append(self.ID_BINARY, 'Binary: ')
+            self.popupmenu.Append(self.ID_DECIMAL, 'Decimal: ')
+            self.popupmenu.Append(self.ID_ASCII, 'Ascii: ')
+        else:
+            cell_decimal = int(cell_hex, 16)
+            self.popupmenu.Append(self.ID_HEX, 'Hex: 0x'+cell_hex)
+            self.popupmenu.Append(self.ID_BINARY, 'Binary: '+str(bin(cell_decimal)))
+            self.popupmenu.Append(self.ID_DECIMAL, 'Decimal: '+str(cell_decimal))
+            try:
+                cell_ascii = chr(cell_decimal)
+                self.popupmenu.Append(self.ID_ASCII, 'Ascii: '+cell_ascii)
+            except UnicodeDecodeError:
+                cell_ascii = ''
+                self.popupmenu.Append(self.ID_ASCII, 'Ascii: '+cell_ascii)
 
     def show_popup_on_hex_grid(self, event):
         # event.GetEventObject
