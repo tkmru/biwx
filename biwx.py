@@ -448,9 +448,10 @@ class Editor(wx.Panel):
         if self.selected_flag == 1:
             # restore selected cell color after change
             changed_selected_cell_color = selected_cell.GetBackgroundColour()
-            if changed_selected_cell_color != (255, 255, 255):
+            if changed_selected_cell_color != (255, 255, 255) and changed_selected_cell_color != (175, 240, 250, 255):
+                # when select cell color change
                 self.old_selected_cell_color = selected_cell.GetBackgroundColour() # update because cell color change
-            self.change_cell_color(self.old_selected_row, self.old_selected_col, selected_cell_color)
+                self.change_cell_color(self.old_selected_row, self.old_selected_col, selected_cell_color)
 
     def update_rows(self, new_binary):
         binary_length = len(new_binary)
