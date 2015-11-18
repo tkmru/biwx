@@ -5,6 +5,7 @@ import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
 import fy
+import sys
 # from multiprocessing import Process
 
 
@@ -530,6 +531,16 @@ class MainWindow(wx.Frame):
         sizer.Add(self.editor, 1, wx.EXPAND)
 
         self.SetBackgroundColour(BACKGROUND_COLOUR)
+
+        try: # command line arg exist. ex) biwx.py [filename]
+            file_path = sys.argv[1]
+            if file_path is not None:
+                self.editor.load_file(file_path)
+                self.SetTitle(file_path)
+                self.SetStatusText('Opened file "{0}".'.format(file_path))
+
+        except:
+            pass
 
     def _file_dialog(self, *args, **kwargs):
         dialog = wx.FileDialog(self, *args, **kwargs)
