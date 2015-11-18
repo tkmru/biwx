@@ -10,6 +10,7 @@ import fy
 
 GRID_LINE_COLOUR = '#e7daf7'
 BACKGROUND_COLOUR = '#e8e8e8'
+NORMAL_CELL_COLOUR = '#ffffff'
 SELECTED_CELL_COLOUR = '#aff0fa'
 FILE_SIGNATURE_COLOUR = '#ffe792'
 
@@ -291,6 +292,8 @@ class Editor(wx.Panel):
         self.old_selected_row = None
         self.old_selected_col = None
         self.old_selected_cell_color = None
+        self.header_indexies = None
+        self.footer_indexies = None
 
         self.hex_grid = HexGrid(self)
         self.hex_table = HexGridTable(self.resource)
@@ -311,7 +314,6 @@ class Editor(wx.Panel):
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
         self.dump_grid.bind_scroll(self.hex_grid)
-
 
         self.popupmenu = wx.Menu()
         item = self.popupmenu.Append(wx.ID_ANY, 'Copy hex')
@@ -397,7 +399,7 @@ class Editor(wx.Panel):
 
     def on_cell_selected(self, event):
         """
-        Get the selection of a single cell by clicking or 
+        Get the selection of a single cell by clicking or
         moving the selection with the arrow keys
         """
         if self.selected_flag == 1:
@@ -428,6 +430,19 @@ class Editor(wx.Panel):
         attr.SetBackgroundColour(color)
         self.dump_table.SetAttr(attr, row, col)
 
+    def restore_signature(self):
+        if self.header_indexies is not None:
+            for file_type, indexies in self.header_indexies.items():
+                for index in indexies:
+                    for i in range(index[0]/2, (index[1]+1)/2):
+                        self.change_cell_color(i/16, i % 16, NORMAL_CELL_COLOUR)
+
+        if self.footer_indexies is not None:
+            for file_type, indexies in self.footer_indexies.items():
+                for index in indexies:
+                    for i in range(index[0]/2, (index[1]+1)/2):
+                        self.change_cell_color(i/16, i % 16, NORMAL_CELL_COLOUR)
+
     def find_signature(self, binary):
         selected_cell = None
         if self.selected_flag == 1:
@@ -435,12 +450,14 @@ class Editor(wx.Panel):
             selected_cell = self.hex_grid.GetOrCreateCellAttr(self.old_selected_row, self.old_selected_col)
             selected_cell_color = selected_cell.GetBackgroundColour()
 
-        for file_type, indexies in fy.get_signature_index(binary, fy.headers).items():
+        self.header_indexies = fy.get_signature_index(binary, fy.headers)
+        for file_type, indexies in self.header_indexies.items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
                     self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
 
-        for file_type, indexies in fy.get_signature_index(binary, fy.footers).items():
+        self.footer_indexies = fy.get_signature_index(binary, fy.footers)
+        for file_type, indexies in self.footer_indexies.items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
                     self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
@@ -470,6 +487,8 @@ class Editor(wx.Panel):
 
     def load_file(self, file_path):
         try:
+            self.restore_signature()
+
             new_binary = fy.get(file_path)
             self.update_rows(new_binary)
             self.resource.binary = new_binary
@@ -525,9 +544,10 @@ class MainWindow(wx.Frame):
     def open_file_dialog(self, event):
         file_path = self._file_dialog('Load a file', style=wx.OPEN)
         print file_path
-        self.editor.load_file(file_path)
-        self.SetTitle(file_path)
-        self.SetStatusText('Opened file "{0}".'.format(file_path))
+        if file_path is not None:
+            self.editor.load_file(file_path)
+            self.SetTitle(file_path)
+            self.SetStatusText('Opened file "{0}".'.format(file_path))
 
     def save_file(self, event):
         target_path = self._file_dialog('Save a file', style=wx.SAVE)
