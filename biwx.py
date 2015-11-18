@@ -430,7 +430,7 @@ class Editor(wx.Panel):
         attr.SetBackgroundColour(color)
         self.dump_table.SetAttr(attr, row, col)
 
-    def restore_signature(self):
+    def remove_old_signature(self):
         if self.header_indexies is not None:
             for file_type, indexies in self.header_indexies.items():
                 for index in indexies:
@@ -487,7 +487,7 @@ class Editor(wx.Panel):
 
     def load_file(self, file_path):
         try:
-            self.restore_signature()
+            self.remove_old_signature()
 
             new_binary = fy.get(file_path)
             self.update_rows(new_binary)
