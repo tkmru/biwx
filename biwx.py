@@ -290,6 +290,7 @@ class Editor(wx.Panel):
         self.resource = Resource()
 
         self.selected_flag = 0
+        self.arg_flag = 0
         self.old_selected_row = None
         self.old_selected_col = None
         self.old_selected_cell_color = None
@@ -403,22 +404,24 @@ class Editor(wx.Panel):
         Get the selection of a single cell by clicking or
         moving the selection with the arrow keys
         """
-        if self.selected_flag == 1:
-            self.change_cell_color(self.old_selected_row, self.old_selected_col, self.old_selected_cell_color)
-        self.selected_flag = 1
 
-        selected_row = event.GetRow()
-        selected_col = event.GetCol()
+        if self.arg_flag == 0:
+            if self.selected_flag == 1:
+                self.change_cell_color(self.old_selected_row, self.old_selected_col, self.old_selected_cell_color)
+            self.selected_flag = 1
 
-        self.old_selected_row = selected_row
-        self.old_selected_col = selected_col
-        self.old_selected_cell_color = self.hex_grid.GetOrCreateCellAttr(selected_row, selected_col).GetBackgroundColour()
+            selected_row = event.GetRow()
+            selected_col = event.GetCol()
 
-        self.change_cell_color(selected_row, selected_col, SELECTED_CELL_COLOUR)
+            self.old_selected_row = selected_row
+            self.old_selected_col = selected_col
+            self.old_selected_cell_color = self.hex_grid.GetOrCreateCellAttr(selected_row, selected_col).GetBackgroundColour()
 
-        self.hex_grid.ForceRefresh() # for being reflected edited data
-        self.dump_grid.ForceRefresh() # for being reflected edited data
-        print 'selected'
+            self.change_cell_color(selected_row, selected_col, SELECTED_CELL_COLOUR)
+
+            self.hex_grid.ForceRefresh() # for being reflected edited data
+            self.dump_grid.ForceRefresh() # for being reflected edited data
+            print 'selected'
 
         event.Skip()
 
@@ -532,12 +535,14 @@ class MainWindow(wx.Frame):
 
         self.SetBackgroundColour(BACKGROUND_COLOUR)
 
-        try: # command line arg exist. ex) biwx.py [filename]
+        try: # if command line arg exist. ex) biwx.py [filename]
             file_path = sys.argv[1]
             if file_path is not None:
+                self.editor.arg_flag = 1
                 self.editor.load_file(file_path)
                 self.SetTitle(file_path)
                 self.SetStatusText('Opened file "{0}".'.format(file_path))
+                self.editor.arg_flag = 0
 
         except:
             pass
