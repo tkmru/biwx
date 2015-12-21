@@ -2,8 +2,20 @@
 biwx
 ====
 
-| 'biwx' is binary editer. It doesn't still work...
+| 'biwx' is binary editer on cross platform. This is still develop version.
 
+
+
+How to use
+==========
+
+    $ python biwx.py
+
+
+Screenshot
+==========
+
+.. image:: ./screenshot.png
 
 ..
   Installation
