@@ -421,7 +421,7 @@ class Editor(wx.Panel):
 
             self.hex_grid.ForceRefresh() # for being reflected edited data
             self.dump_grid.ForceRefresh() # for being reflected edited data
-            print 'selected'
+            print 'selected' + hex(selected_col+16*selected_row)
 
         event.Skip()
 
@@ -539,6 +539,8 @@ class MainWindow(wx.Frame):
         sizer.Add(self.editor, 1, wx.EXPAND)
 
         self.SetBackgroundColour(BACKGROUND_COLOUR)
+        self.editor.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.display_address)
+        self.editor.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.display_address)
 
         try: # if command line arg exist. ex) biwx.py [filename]
             file_path = sys.argv[1]
@@ -551,6 +553,13 @@ class MainWindow(wx.Frame):
 
         except:
             pass
+
+    def display_address(self, event):
+        selected_row = event.GetRow()
+        selected_col = event.GetCol()
+        hex_value = self.editor.hex_grid.GetCellValue(selected_row, selected_col)
+        dump_value = self.editor.dump_grid.GetCellValue(selected_row, selected_col)
+        self.SetStatusText('address: 0x{0:0>6X},   hex value: 0x{1},   dump value: {2}'.format(selected_col+16*selected_row, hex_value, dump_value))
 
     def _file_dialog(self, *args, **kwargs):
         dialog = wx.FileDialog(self, *args, **kwargs)
