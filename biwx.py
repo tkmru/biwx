@@ -560,6 +560,7 @@ class MainWindow(wx.Frame):
         hex_value = self.editor.hex_grid.GetCellValue(selected_row, selected_col)
         dump_value = self.editor.dump_grid.GetCellValue(selected_row, selected_col)
         self.SetStatusText('address: 0x{0:0>6X},   hex value: 0x{1},   dump value: {2}'.format(selected_col+16*selected_row, hex_value, dump_value))
+        event.Skip()
 
     def _file_dialog(self, *args, **kwargs):
         dialog = wx.FileDialog(self, *args, **kwargs)
