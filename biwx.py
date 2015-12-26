@@ -577,7 +577,7 @@ class MainWindow(wx.Frame):
         if file_path is not None:
             self.editor.load_file(file_path)
             self.SetTitle(file_path)
-            self.SetStatusText('Opened file "{0}".'.format(file_path))
+            self.SetStatusText('Opened file "{0}".'.format(file_path.encode('utf-8')))
 
     def save_file(self, event):
         target_path = self._file_dialog('Save a file', style=wx.SAVE)
