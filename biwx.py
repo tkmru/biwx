@@ -27,7 +27,7 @@ class ScrollBinder(object):
 
     '''
     http://wxpython-users.1045709.n5.nabble.com/Scrolling-grids-simultaneously-td2349695.html
-    Inherit to be able to bind vscrolling to another widget.
+    Inherit to be able to bind scrolling to another widget.
     '''
 
     def __init__(self):
@@ -47,13 +47,23 @@ class ScrollBinder(object):
         self.Bind(wx.EVT_SCROLLWIN_PAGEDOWN, self._pagedown)
         self.Bind(wx.EVT_SCROLLWIN_TOP, self._top)
         self.Bind(wx.EVT_SCROLLWIN_BOTTOM, self._bottom)
-        self.Bind(wx.EVT_KEY_DOWN, self._key_down)
+        self.Bind(wx.EVT_CHAR_HOOK, self._key_down)
 
     def bind_scroll(self, target):
-        self._bound_widget = target
+        self._bound_widget = target # another grid
 
     def _key_down(self, event):
-        pass
+        '''for the up arrow key and the down arrow key'''
+        keycode = event.GetKeyCode()
+        y_pos = self.GetViewStart()[1]
+        if keycode == wx.WXK_DOWN:
+            self._bound_widget.scroll_to(y_pos+1)
+            self.scroll_to(y_pos+1)
+        elif keycode == wx.WXK_UP:
+            self._bound_widget.scroll_to(y_pos-1)
+            self.scroll_to(y_pos-1)
+        else:
+            event.Skip()
 
     def _mousewheel(self, event):
         '''Mouse wheel scrolled. Up or down, give or take.'''
@@ -95,8 +105,9 @@ class ScrollBinder(object):
             event.Skip()
             return
 
-        self._bound_widget.scroll_to(0)
-        self.scroll_to(0)
+        pos = 0
+        self._bound_widget.scroll_to(pos)
+        self.scroll_to(pos)
 
     def _bottom(self, event):
         '''Event handler for going to the bottom.'''
@@ -109,7 +120,7 @@ class ScrollBinder(object):
         self.scroll_to(pos)
 
     def _lineup_or_down(self, event=None):
-        '''Event handler for pressing the up arrow or the down arrow.'''
+        '''Event handler for trackpad.'''
         if event and event.GetOrientation() != wx.VERTICAL:
             event.Skip()
             return
