@@ -527,28 +527,27 @@ class MainWindow(wx.Frame):
         self.CreateStatusBar() # a Statusbar in the bottom of the window
         ID_AUTO_EXTRACT = wx.NewId()
 
-        # setting up the menu.
-        file_menu = wx.Menu()
-        analysis_menu = wx.Menu()
+        # creating the menubar.
+        menu_bar = wx.MenuBar()
 
         # on OSX Cocoa both the about and the quit menu belong to the bold 'app menu'.
+        file_menu = wx.Menu() # setting up the menu.
         file_menu.Append(wx.ID_ABOUT, '&About', 'Information about this program')
         file_menu.Append(wx.ID_PREFERENCES, '&Preferences')
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
         file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
         file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
         file_menu.Append(wx.ID_SAVE, '&Save', 'Save current binary')
-
-        analysis_menu.Append(ID_AUTO_EXTRACT, '&Auto extract', 'Auto extract embedded file')
-
-        # creating the menubar.
-        menu_bar = wx.MenuBar()
-        menu_bar.Append(file_menu, '&File')
-        self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
         self.Connect(wx.ID_OPEN, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
         self.Connect(wx.ID_SAVE, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.save_file)
+        menu_bar.Append(file_menu, '&File')
+
+        analysis_menu = wx.Menu() # setting up the menu.
+        analysis_menu.Append(ID_AUTO_EXTRACT, '&Auto extract', 'Auto extract embedded file')
         menu_bar.Append(analysis_menu, '&Analysis')
-        self.SetMenuBar(menu_bar)  # adding the MenuBar to the Frame content.
+
+        # adding the MenuBar to the Frame content.
+        self.SetMenuBar(menu_bar)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = Editor(self)
