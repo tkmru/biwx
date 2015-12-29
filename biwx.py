@@ -591,7 +591,6 @@ class MainWindow(wx.Frame):
 
     def open_file_dialog(self, event):
         file_path = self._file_dialog('Load a file', style=wx.OPEN)
-        print file_path
         if file_path is not None:
             self.editor.load_file(file_path)
             self.SetTitle(file_path)
@@ -599,10 +598,11 @@ class MainWindow(wx.Frame):
 
     def save_file(self, event):
         target_path = self._file_dialog('Save a file', style=wx.SAVE)
-        print target_path
         self.SetStatusText('Saved file "{0}".'.format(target_path))
-        print self.editor.resource.binary
-        fy.write(target_path, self.editor.resource.binary)
+        try:
+            fy.write(target_path, self.editor.resource.binary)
+        except TypeError: # target_path is empty, when cancel button click.
+            pass
 
 
 def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
