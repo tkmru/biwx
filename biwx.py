@@ -504,10 +504,15 @@ class Editor(wx.Panel):
         try:
             self.remove_old_signature()
 
-            new_binary = fy.get(file_path)
-            self.update_rows(new_binary)
-            self.resource.binary = new_binary
-            self.find_signature(new_binary)
+            new_binary_string = fy.get(file_path)
+            self.update_rows(new_binary_string)
+            self.resource.binary = new_binary_string
+            self.find_signature(new_binary_string)
+
+            header_index = fy.get_signature_index(new_binary_string, fy.headers)
+            footer_index = fy.get_signature_index(new_binary_string, fy.footers)
+            if fy.check_hidden_data(new_binary_string, header_index, footer_index):
+                message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
         except Exception, e:
             print e
