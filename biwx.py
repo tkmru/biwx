@@ -161,6 +161,7 @@ class ScrollBinder(object):
 class Resource(object):
 
     def __init__(self):
+        self.file_path = None
         self.binary = '57656c636f6d6520746f20626977782121'
 
     def insert(self, row, col, hex_value):
@@ -505,6 +506,7 @@ class Editor(wx.Panel):
             self.remove_old_signature()
 
             new_binary_string = fy.get(file_path)
+            self.resource.file_path = file_path
             self.update_rows(new_binary_string)
             self.resource.binary = new_binary_string
             self.find_signature(new_binary_string)
@@ -544,6 +546,7 @@ class MainWindow(wx.Frame):
 
         analysis_menu = wx.Menu() # setting up the menu.
         analysis_menu.Append(ID_AUTO_EXTRACT, '&Auto extract', 'Auto extract embedded file')
+        self.Connect(ID_AUTO_EXTRACT, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.extract_files)
         menu_bar.Append(analysis_menu, '&Analysis')
 
         # adding the MenuBar to the Frame content.
@@ -568,6 +571,11 @@ class MainWindow(wx.Frame):
 
         except:
             pass
+
+    def extract_files(self, event):
+        target_path = self.editor.resource.file_path
+        if target_path is not None:
+            print fy.extract(target_path, 'result')
 
     def display_address(self, event):
         selected_row = event.GetRow()
