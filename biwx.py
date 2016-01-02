@@ -4,6 +4,7 @@
 import wx
 import wx.grid as wxgrid
 import wx.lib.agw.genericmessagedialog as wxgmd
+import wx.lib.dialogs as wxdialogs
 import fy
 import sys
 # from multiprocessing import Process
@@ -575,7 +576,19 @@ class MainWindow(wx.Frame):
     def extract_files(self, event):
         target_path = self.editor.resource.file_path
         if target_path is not None:
-            print fy.extract(target_path, 'result')
+            extract_files = fy.extract(target_path, 'result')
+
+            # create message on dialog
+            result = ''
+            for file_type, path_list in extract_files.items():
+                result += 'extract {0} {1} files.\n'.format(len(extract_files)+1, file_type)
+                for path in path_list:
+                    result += path+'\n'
+                result += '\n'
+
+            dlg = wxdialogs.ScrolledMessageDialog(self, result, "extract files")
+            dlg.ShowModal()
+            dlg.Destroy()
 
     def display_address(self, event):
         selected_row = event.GetRow()
