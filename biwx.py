@@ -456,21 +456,19 @@ class Editor(wx.Panel):
                     for i in range(index[0]/2, (index[1]+1)/2):
                         self.change_cell_color(i/16, i % 16, NORMAL_CELL_COLOUR)
 
-    def change_signature_cell_color(self, binary):
+    def change_signature_cell_color(self, header_indexies, footer_indexies):
         selected_cell = None
         if self.selected_flag == 1:
             # save selected cell color before change
             selected_cell = self.hex_grid.GetOrCreateCellAttr(self.old_selected_row, self.old_selected_col)
             selected_cell_color = selected_cell.GetBackgroundColour()
 
-        self.header_indexies = fy.get_signature_index(binary, fy.headers)
-        for file_type, indexies in self.header_indexies.items():
+        for file_type, indexies in header_indexies.items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
                     self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
 
-        self.footer_indexies = fy.get_signature_index(binary, fy.footers)
-        for file_type, indexies in self.footer_indexies.items():
+        for file_type, indexies in footer_indexies.items():
             for index in indexies:
                 for i in range(index[0]/2, (index[1]+1)/2):
                     self.change_cell_color(i/16, i % 16, FILE_SIGNATURE_COLOUR)
@@ -506,11 +504,11 @@ class Editor(wx.Panel):
             self.resource.file_path = file_path
             self.update_rows(new_binary_string)
             self.resource.binary = new_binary_string
-            self.change_signature_cell_color(new_binary_string)
+            header_indexies = fy.get_signature_index(new_binary_string, fy.headers)
+            footer_indexies = fy.get_signature_index(new_binary_string, fy.footers)
+            self.change_signature_cell_color(header_indexies, footer_indexies)
 
-            header_index = fy.get_signature_index(new_binary_string, fy.headers)
-            footer_index = fy.get_signature_index(new_binary_string, fy.footers)
-            if fy.check_hidden_data(new_binary_string, header_index, footer_index):
+            if fy.check_hidden_data(new_binary_string, header_indexies, footer_indexies):
                 message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
         except Exception, e:
