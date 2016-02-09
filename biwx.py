@@ -315,16 +315,12 @@ class Editor(wx.Panel):
         self.hex_grid.SetTable(self.hex_table)
         self.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
         self.hex_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.show_popup_on_hex_grid)
-        # self.hex_grid.GetGridWindow().Bind(wx.EVT_MOTION, self.on_mouse_over)
-        # self.hex_grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         self.dump_grid = DumpGrid(self)
         self.dump_table = DumpGridTable(self.resource)
         self.dump_grid.SetTable(self.dump_table)
         self.dump_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.on_cell_selected)
         self.dump_grid.GetGridWindow().Bind(wx.EVT_RIGHT_DOWN, self.show_popup_on_dump_grid)
-        # self.dump_grid.GetGridWindow().Bind(wx.EVT_MOTION, self.on_mouse_over)
-        # self.dump_grid.Bind(wxgrid.EVT_GRID_CELL_CHANGE, self.on_cell_changed)
 
         # Bind the scrollbars of the widgets.
         self.hex_grid.bind_scroll(self.dump_grid)
@@ -447,7 +443,7 @@ class Editor(wx.Panel):
         attr.SetBackgroundColour(color)
         self.dump_table.SetAttr(attr, row, col)
 
-    def remove_old_signature(self):
+    def remove_old_signature_cell_color(self):
         if self.header_indexies is not None:
             for file_type, indexies in self.header_indexies.items():
                 for index in indexies:
@@ -504,7 +500,7 @@ class Editor(wx.Panel):
 
     def load_file(self, file_path):
         try:
-            self.remove_old_signature()
+            self.remove_old_signature_cell_color()
 
             new_binary_string = fy.get(file_path)
             self.resource.file_path = file_path
