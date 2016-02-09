@@ -460,7 +460,7 @@ class Editor(wx.Panel):
                     for i in range(index[0]/2, (index[1]+1)/2):
                         self.change_cell_color(i/16, i % 16, NORMAL_CELL_COLOUR)
 
-    def find_signature(self, binary):
+    def change_signature_cell_color(self, binary):
         selected_cell = None
         if self.selected_flag == 1:
             # save selected cell color before change
@@ -510,7 +510,7 @@ class Editor(wx.Panel):
             self.resource.file_path = file_path
             self.update_rows(new_binary_string)
             self.resource.binary = new_binary_string
-            self.find_signature(new_binary_string)
+            self.change_signature_cell_color(new_binary_string)
 
             header_index = fy.get_signature_index(new_binary_string, fy.headers)
             footer_index = fy.get_signature_index(new_binary_string, fy.footers)
