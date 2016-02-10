@@ -7,7 +7,7 @@ import wx.lib.agw.genericmessagedialog as wxgmd
 import wx.lib.dialogs as wxdialogs
 import fy
 import sys
-# from multiprocessing import Process
+from multiprocessing import Process
 
 
 GRID_LINE_COLOUR = '#e7daf7'
@@ -496,6 +496,10 @@ class Editor(wx.Panel):
         self.dump_table.append_rows(added_rows)
         self.dump_grid.ForceRefresh()
 
+    def check_hidden_data(self, binary_string, header_indexies, footer_indexies):
+        if fy.check_hidden_data(binary_string, header_indexies, footer_indexies):
+            message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
+
     def load_file(self, file_path):
         try:
             self.remove_old_signature_cell_color()
@@ -514,6 +518,23 @@ class Editor(wx.Panel):
         except Exception, e:
             print e
             message_box('Can not open file {0}.'.format(file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
+
+
+class DetailWindow(wx.Notebook):
+    def __init__(self, *args, **kwags):
+        wx.Notebook.__init__(self, *args, **kwags)
+
+        panel_1 = wx.Panel(self, wx.ID_ANY)
+        panel_2 = wx.Panel(self, wx.ID_ANY)
+        panel_3 = wx.Panel(self, wx.ID_ANY)
+
+        panel_1.SetBackgroundColour("#FF0000")
+        panel_2.SetBackgroundColour("#00FF00")
+        panel_3.SetBackgroundColour("#0000FF")
+
+        self.InsertPage(0, panel_1, "tab_1")
+        self.InsertPage(1, panel_2, "tab_2")
+        self.InsertPage(2, panel_3, "tab_3")
 
 
 class MainWindow(wx.Frame):
