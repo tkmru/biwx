@@ -568,9 +568,7 @@ class MainWindow(wx.Frame):
         # adding the MenuBar to the Frame content.
         self.SetMenuBar(menu_bar)
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
         self.editor = Editor(self)
-        sizer.Add(self.editor, 1, wx.EXPAND)
 
         self.SetBackgroundColour(BACKGROUND_COLOUR)
         self.editor.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.display_address)
