@@ -350,8 +350,8 @@ class Editor(wx.Panel):
         self.hex_grid.Refresh()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.hex_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=3)
-        sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND)
+        sizer.Add(self.hex_grid, flag=wx.EXPAND | wx.RIGHT, border=3)
+        sizer.Add(self.dump_grid, flag=wx.EXPAND | wx.RIGHT, border=10)
         self.SetSizerAndFit(sizer)
 
     def on_popup_selected(self, event):
@@ -379,6 +379,7 @@ class Editor(wx.Panel):
             try:
                 cell_ascii = chr(cell_decimal)
                 self.popupmenu.Append(self.ID_ASCII, 'Ascii: '+cell_ascii)
+
             except UnicodeDecodeError:
                 cell_ascii = ''
                 self.popupmenu.Append(self.ID_ASCII, 'Ascii: '+cell_ascii)
@@ -567,8 +568,15 @@ class MainWindow(wx.Frame):
 
         # adding the MenuBar to the Frame content.
         self.SetMenuBar(menu_bar)
+        self.detail_window = DetailWindow(self)
 
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.detail_window = DetailWindow(self)
+        sizer.Add(self.detail_window, proportion=1)
         self.editor = Editor(self)
+        sizer.Add(self.editor, proportion=1)
+
+        self.SetSizer(sizer)
 
         self.SetBackgroundColour(BACKGROUND_COLOUR)
         self.editor.hex_grid.Bind(wxgrid.EVT_GRID_SELECT_CELL, self.display_address)
@@ -635,6 +643,7 @@ class MainWindow(wx.Frame):
         self.SetStatusText('Saved file "{0}".'.format(target_path))
         try:
             fy.write(target_path, self.editor.resource.binary)
+
         except TypeError: # target_path is empty, when cancel button click.
             pass
 
@@ -647,7 +656,7 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.frame = MainWindow(None, title='biwx', size=(810, 510))
+        self.frame = MainWindow(None, title='biwx', size=(1050, 510))
         self.frame.Show()
         self.SetTopWindow(self.frame)
         return True
