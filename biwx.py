@@ -591,7 +591,7 @@ class MainWindow(wx.Frame):
                 self.SetStatusText('Opened file "{0}".'.format(file_path))
                 self.editor.arg_flag = 0
 
-        except:
+        except IndexError:
             pass
 
     def extract_files(self, event):
