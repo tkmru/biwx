@@ -529,9 +529,9 @@ class DetailWindow(wx.Notebook):
         panel_2 = wx.Panel(self, wx.ID_ANY)
         panel_3 = wx.Panel(self, wx.ID_ANY)
 
-        panel_1.SetBackgroundColour("#FF0000")
-        panel_2.SetBackgroundColour("#00FF00")
-        panel_3.SetBackgroundColour("#0000FF")
+        panel_1.SetBackgroundColour("#F0FFFF")
+        panel_2.SetBackgroundColour("#FFF0FF")
+        panel_3.SetBackgroundColour("#FFFFF0")
 
         self.InsertPage(0, panel_1, "tab_1")
         self.InsertPage(1, panel_2, "tab_2")
@@ -568,11 +568,10 @@ class MainWindow(wx.Frame):
 
         # adding the MenuBar to the Frame content.
         self.SetMenuBar(menu_bar)
-        self.detail_window = DetailWindow(self)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.detail_window = DetailWindow(self)
-        sizer.Add(self.detail_window, proportion=1)
+        sizer.Add(self.detail_window, proportion=1, flag=wx.EXPAND)
         self.editor = Editor(self)
         sizer.Add(self.editor, proportion=1)
 
