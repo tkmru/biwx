@@ -7,7 +7,7 @@ import wx.lib.agw.genericmessagedialog as wxgmd
 import wx.lib.dialogs as wxdialogs
 import fy
 import sys
-from multiprocessing import Process
+# from multiprocessing import Process
 
 
 GRID_LINE_COLOUR = '#e7daf7'
@@ -178,13 +178,15 @@ class Resource(object):
 class DumpGrid(wxgrid.Grid, ScrollBinder):
 
     def __init__(self, parent):
-        self.parent = parent
-        wxgrid.Grid.__init__(self, self.parent, -1)
+        wxgrid.Grid.__init__(self, parent, -1)
         ScrollBinder.__init__(self)
         self.SetGridLineColour(GRID_LINE_COLOUR)
         self.SetColLabelSize(COL_LABEL_SIZE)
         self.HideRowLabels()
         self.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+
+        # http://stackoverflow.com/questions/4852972/wxpython-wxgrid-without-vertical-scrollbar
+        self.ShowScrollbars(wx.SHOW_SB_DEFAULT, wx.SHOW_SB_NEVER)
 
         # Disallow rows stretching vertically and set a fixed height.
         self.DisableDragRowSize()
@@ -202,7 +204,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
         self.resource = resource
 
     def GetNumberRows(self):
-        return 22
+        return 100
 
     def GetNumberCols(self):
         return 16
@@ -239,8 +241,7 @@ class DumpGridTable(wxgrid.PyGridTableBase):
 class HexGrid(wxgrid.Grid, ScrollBinder):
 
     def __init__(self, parent):
-        self.parent = parent
-        wxgrid.Grid.__init__(self, self.parent, -1)
+        wxgrid.Grid.__init__(self, parent, -1)
         ScrollBinder.__init__(self)
         self.SetGridLineColour(GRID_LINE_COLOUR)
         self.SetRowLabelSize(ROW_LABEL_SIZE)
@@ -265,7 +266,7 @@ class HexGridTable(wxgrid.PyGridTableBase):
         self.resource = resource
 
     def GetNumberRows(self):
-        return 22
+        return 100
 
     def GetNumberCols(self):
         return 16
@@ -351,7 +352,7 @@ class Editor(wx.Panel):
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.hex_grid, flag=wx.EXPAND | wx.RIGHT, border=3)
-        sizer.Add(self.dump_grid, flag=wx.EXPAND | wx.RIGHT, border=10)
+        sizer.Add(self.dump_grid, proportion=1, flag=wx.EXPAND | wx.RIGHT, border=10)
         self.SetSizerAndFit(sizer)
 
     def on_popup_selected(self, event):
@@ -573,7 +574,7 @@ class MainWindow(wx.Frame):
         self.detail_window = DetailWindow(self)
         sizer.Add(self.detail_window, proportion=1, flag=wx.EXPAND)
         self.editor = Editor(self)
-        sizer.Add(self.editor, proportion=1)
+        sizer.Add(self.editor, proportion=1, flag=wx.EXPAND)
 
         self.SetSizer(sizer)
 
