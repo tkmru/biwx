@@ -7,6 +7,7 @@ import wx.lib.agw.genericmessagedialog as wxgmd
 import wx.lib.dialogs as wxdialogs
 import fy
 import sys
+import string
 # from multiprocessing import Process
 
 
@@ -522,17 +523,36 @@ class Editor(wx.Panel):
             message_box('Can not open file {0}.'.format(file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
 
 
+def strings(filename, min=4):
+    with open(filename, "rb") as f:
+        result = ""
+        for c in f.read():
+            if c in string.printable:
+                result += c
+                continue
+            if len(result) >= min:
+                yield result
+            result = ""
+
+
 class DetailWindow(wx.Notebook):
     def __init__(self, *args, **kwags):
         wx.Notebook.__init__(self, *args, **kwags)
 
-        signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
 
-        self.InsertPage(0, signature_textctrl, "signature")
-        self.InsertPage(1, strings_textctrl, "strings")
-        self.InsertPage(2, pdf_parse_textctrl, "pdf-parse")
+        self.InsertPage(0, self.signature_textctrl, "signature")
+        self.InsertPage(1, self.strings_textctrl, "strings")
+        self.InsertPage(2, self.pdf_parse_textctrl, "pdf-parse")
+
+    def load_strings(self, file_path):
+        for s in strings(file_path):
+            self.strings_textctrl.AppendText(s)
+
+    def load_file(self, file_path):
+        self.load_strings(file_path)
 
 
 class MainWindow(wx.Frame):
@@ -631,6 +651,7 @@ class MainWindow(wx.Frame):
         file_path = self._file_dialog('Load a file', style=wx.OPEN)
         if file_path is not None:
             self.editor.load_file(file_path)
+            self.detail_window.load_file(file_path)
             self.SetTitle(file_path)
             self.SetStatusText('Opened file "{0}".'.format(file_path.encode('utf-8')))
 
