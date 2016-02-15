@@ -526,17 +526,13 @@ class DetailWindow(wx.Notebook):
     def __init__(self, *args, **kwags):
         wx.Notebook.__init__(self, *args, **kwags)
 
-        panel_1 = wx.Panel(self, wx.ID_ANY)
-        panel_2 = wx.Panel(self, wx.ID_ANY)
-        panel_3 = wx.Panel(self, wx.ID_ANY)
+        signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
 
-        panel_1.SetBackgroundColour("#F0FFFF")
-        panel_2.SetBackgroundColour("#FFF0FF")
-        panel_3.SetBackgroundColour("#FFFFF0")
-
-        self.InsertPage(0, panel_1, "tab_1")
-        self.InsertPage(1, panel_2, "tab_2")
-        self.InsertPage(2, panel_3, "tab_3")
+        self.InsertPage(0, signature_textctrl, "signature")
+        self.InsertPage(1, strings_textctrl, "strings")
+        self.InsertPage(2, pdf_parse_textctrl, "pdf-parse")
 
 
 class MainWindow(wx.Frame):
@@ -656,7 +652,7 @@ def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.frame = MainWindow(None, title='biwx', size=(1050, 510))
+        self.frame = MainWindow(None, title='biwx', size=(1130, 550))
         self.frame.Show()
         self.SetTopWindow(self.frame)
         return True
