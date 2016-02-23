@@ -503,24 +503,18 @@ class Editor(wx.Panel):
         if fy.check_hidden_data(binary_string, header_indexies, footer_indexies):
             message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
-    def load_file(self, file_path):
+    def load_file(self, header_indexies, footer_indexies):
         try:
             self.remove_old_signature_cell_color()
-
-            new_binary_string = fy.get(file_path)
-            self.resource.file_path = file_path
-            self.update_rows(new_binary_string)
-            self.resource.binary = new_binary_string
-            header_indexies = fy.get_signature_index(new_binary_string, fy.headers)
-            footer_indexies = fy.get_signature_index(new_binary_string, fy.footers)
+            self.update_rows(self.resource.binary)
             self.change_signature_cell_color(header_indexies, footer_indexies)
 
-            if fy.check_hidden_data(new_binary_string, header_indexies, footer_indexies):
+            if fy.check_hidden_data(self.resource.binary, header_indexies, footer_indexies):
                 message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
         except Exception, e:
             print e
-            message_box('Can not open file {0}.'.format(file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
+            message_box('Can not open file {0}.'.format(self.resource.file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
 
 
 def strings(filename, min=4):
@@ -539,9 +533,9 @@ class DetailWindow(wx.Notebook):
     def __init__(self, *args, **kwags):
         wx.Notebook.__init__(self, *args, **kwags)
 
-        self.signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        self.strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
-        self.pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
+        self.signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
+        self.strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
+        self.pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
 
         self.InsertPage(0, self.signature_textctrl, "signature")
         self.InsertPage(1, self.strings_textctrl, "strings")
@@ -650,8 +644,16 @@ class MainWindow(wx.Frame):
     def open_file_dialog(self, event):
         file_path = self._file_dialog('Load a file', style=wx.OPEN)
         if file_path is not None:
-            self.editor.load_file(file_path)
-            self.detail_window.load_file(file_path)
+            new_binary_string = fy.get(file_path)
+            header_indexies = fy.get_signature_index(new_binary_string, fy.headers)
+            footer_indexies = fy.get_signature_index(new_binary_string, fy.footers)
+
+            self.editor.resource.file_path = file_path
+            self.editor.resource.binary = new_binary_string
+            self.editor.load_file(header_indexies, footer_indexies)
+
+            self.detail_window.load_file(file_path) # heavy
+
             self.SetTitle(file_path)
             self.SetStatusText('Opened file "{0}".'.format(file_path.encode('utf-8')))
 
