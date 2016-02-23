@@ -3,6 +3,8 @@
 
 import wx
 
+ROW_SIZE = 20
+
 
 class ScrollBinder(object):
 
