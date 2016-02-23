@@ -116,7 +116,7 @@ class MainWindow(wx.Frame):
             self.editor.resource.binary = new_binary_string
             self.editor.load_file(header_indexies, footer_indexies)
 
-            self.detail_window.load_file(file_path) # heavy
+            self.detail_window.load_file(file_path, header_indexies, footer_indexies) # heavy
 
             self.SetTitle(file_path)
             self.SetStatusText('Opened file "{0}".'.format(file_path.encode('utf-8')))

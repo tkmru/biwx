@@ -15,14 +15,16 @@ class DetailWindow(wx.Notebook):
 
         self.InsertPage(0, self.signature_textctrl, "signature")
         self.InsertPage(1, self.strings_textctrl, "strings")
-        self.InsertPage(2, self.pdf_parse_textctrl, "pdf-parse")
 
     def load_strings(self, file_path):
         for s in strings(file_path):
             self.strings_textctrl.AppendText(s)
 
-    def load_file(self, file_path):
+    def load_file(self, file_path, header_indexies, footer_indexies):
         self.load_strings(file_path)
+        if 'pdf' in file_path:
+            self.InsertPage(2, self.pdf_parse_textctrl, "pdf-parse")
+        print header_indexies, footer_indexies
 
 
 def strings(filename, min=4):
