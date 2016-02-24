@@ -22,9 +22,19 @@ class DetailWindow(wx.Notebook):
 
     def load_file(self, file_path, header_indexies, footer_indexies):
         self.load_strings(file_path)
+        self.display_signature(header_indexies, footer_indexies)
         if 'pdf' in file_path:
             self.InsertPage(2, self.pdf_parse_textctrl, "pdf-parse")
         print header_indexies, footer_indexies
+
+    def display_signature(self, header_indexies, footer_indexies):
+        self.signature_textctrl.AppendText('HEADER\n')
+        for key in header_indexies.keys():
+            self.signature_textctrl.AppendText(key + ': ' + str(len(header_indexies[key])) + 'signature\n')
+
+        self.signature_textctrl.AppendText('\nFOOTER\n')
+        for key in footer_indexies.keys():
+            self.signature_textctrl.AppendText(key + ': ' + str(len(footer_indexies[key])) + 'signature\n')
 
 
 def strings(filename, min=4):
