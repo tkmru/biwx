@@ -4,7 +4,7 @@
 import wx
 import wx.grid
 import grids
-import wx.lib.agw.genericmessagedialog as wxgmd
+import ui_parts
 import fy
 
 NORMAL_CELL_COLOUR = '#ffffff'
@@ -232,7 +232,7 @@ class Editor(wx.Panel):
 
     def check_hidden_data(self, binary_string, header_indexies, footer_indexies):
         if fy.check_hidden_data(binary_string, header_indexies, footer_indexies):
-            message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
+            ui_parts.message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
     def load_file(self, header_indexies, footer_indexies):
         try:
@@ -241,14 +241,8 @@ class Editor(wx.Panel):
             self.change_signature_cell_color(header_indexies, footer_indexies)
 
             if fy.check_hidden_data(self.resource.binary, header_indexies, footer_indexies):
-                message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
+                ui_parts.message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
         except Exception, e:
             print e
-            message_box('Can not open file {0}.'.format(self.resource.file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
-
-
-def message_box(message, title, style=wx.OK | wx.ICON_INFORMATION):
-    dialog = wxgmd.GenericMessageDialog(None, message, title, style)
-    dialog.ShowModal()
-    dialog.Destroy()
+            ui_parts.message_box('Can not open file {0}.'.format(self.resource.file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
