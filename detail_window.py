@@ -3,6 +3,7 @@
 
 import wx
 import string
+import subprocess
 
 
 class DetailWindow(wx.Notebook):
@@ -16,16 +17,17 @@ class DetailWindow(wx.Notebook):
         self.InsertPage(0, self.signature_textctrl, "signature")
         self.InsertPage(1, self.strings_textctrl, "strings")
 
-    def load_strings(self, file_path):
-        for s in strings(file_path):
-            self.strings_textctrl.AppendText(s)
-
     def load_file(self, file_path, header_indexies, footer_indexies):
         self.load_strings(file_path)
         self.display_signature(header_indexies, footer_indexies)
         if 'pdf' in file_path:
             self.InsertPage(2, self.pdf_parse_textctrl, "pdf-parse")
+            self.pdfparse(file_path)
         print header_indexies, footer_indexies
+
+    def load_strings(self, file_path):
+        for s in strings(file_path):
+            self.strings_textctrl.AppendText(s)
 
     def display_signature(self, header_indexies, footer_indexies):
         self.signature_textctrl.AppendText('HEADER\n')
@@ -35,6 +37,10 @@ class DetailWindow(wx.Notebook):
         self.signature_textctrl.AppendText('\nFOOTER\n')
         for key in footer_indexies.keys():
             self.signature_textctrl.AppendText(key + ': ' + str(len(footer_indexies[key])) + 'signature\n')
+
+    def pdfparse(self, file_path):
+        result = subprocess.check_output(['python', 'pdf-parser.py', file_path])
+        self.pdf_parse_textctrl.AppendText(result)
 
 
 def strings(filename, min=4):
