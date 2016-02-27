@@ -4,6 +4,7 @@
 import wx
 import string
 import subprocess
+import ui_parts
 
 
 class DetailWindow(wx.Notebook):
@@ -40,6 +41,9 @@ class DetailWindow(wx.Notebook):
 
     def pdfparse(self, file_path):
         result = subprocess.check_output(['python', 'pdf-parser.py', file_path])
+        if 'JavaScript' in result:
+            ui_parts.message_box('This PDF include JavaScript code.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
+
         self.pdf_parse_textctrl.AppendText(result)
 
 
