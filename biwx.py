@@ -20,6 +20,7 @@ class MainWindow(wx.Frame):
 
         self.CreateStatusBar() # a Statusbar in the bottom of the window
         ID_AUTO_EXTRACT = wx.NewId()
+        ID_EXTRACT_FROM_PDF = wx.NewId()
 
         # creating the menubar.
         menu_bar = wx.MenuBar()
@@ -37,8 +38,10 @@ class MainWindow(wx.Frame):
         menu_bar.Append(file_menu, '&File')
 
         analysis_menu = wx.Menu() # setting up the menu.
-        analysis_menu.Append(ID_AUTO_EXTRACT, '&Auto extract', 'Auto extract embedded file')
+        analysis_menu.Append(ID_AUTO_EXTRACT, '&Auto extract embedded file', 'Auto extract embedded file')
         self.Connect(ID_AUTO_EXTRACT, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.extract_files)
+        analysis_menu.Append(ID_EXTRACT_FROM_PDF, '&Extract JavaScript code from pdf', 'Extract JavaScript code from pdf')
+        self.Connect(ID_EXTRACT_FROM_PDF, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.extract_js_from_pdf)
         menu_bar.Append(analysis_menu, '&Analysis')
 
         # adding the MenuBar to the Frame content.
@@ -84,6 +87,9 @@ class MainWindow(wx.Frame):
             dlg = wxdialogs.ScrolledMessageDialog(self, result, "extract files")
             dlg.ShowModal()
             dlg.Destroy()
+
+    def extract_js_from_pdf(self, event):
+        pass
 
     def display_address(self, event):
         selected_row = event.GetRow()
