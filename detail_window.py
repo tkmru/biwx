@@ -5,6 +5,7 @@ import wx
 import string
 import subprocess
 import ui_parts
+import pdfid_v0_2_1.pdfid
 
 
 class DetailWindow(wx.Notebook):
