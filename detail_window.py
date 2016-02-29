@@ -47,11 +47,14 @@ class DetailWindow(wx.Notebook):
         self.pdfid_textctrl.AppendText(result)
 
     def display_pdfparse(self, file_path):
-        result = subprocess.check_output(['python', 'pdf-parser.py', file_path])
+        result = subprocess.check_output(['python', 'pdf-parser.py', '--filter', '--raw', file_path])
+        JS_start = result.find('</JavaScript')
+        JS_end = result.find('/JavaScript>') + len('/JavaScript>')
+
         if 'JavaScript' in result:
             ui_parts.message_box('This PDF include JavaScript code.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
-        self.pdf_parse_textctrl.AppendText(result)
+        self.pdf_parse_textctrl.AppendText(result[JS_start: JS_end])
 
 
 def strings(filename, min=4):
