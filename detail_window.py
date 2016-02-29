@@ -5,7 +5,7 @@ import wx
 import string
 import subprocess
 import ui_parts
-import pdfid_v0_2_1.pdfid
+#import pdfid_v0_2_1.pdfid as pdfidlib
 
 
 class DetailWindow(wx.Notebook):
@@ -14,6 +14,7 @@ class DetailWindow(wx.Notebook):
 
         self.signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
         self.strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
+        self.pdfid_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
         self.pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
 
         self.InsertPage(0, self.signature_textctrl, "signature")
@@ -23,9 +24,10 @@ class DetailWindow(wx.Notebook):
         self.load_strings(file_path)
         self.display_signature(header_indexies, footer_indexies)
         if 'pdf' in file_path:
-            self.InsertPage(2, self.pdf_parse_textctrl, "pdf-parse")
-            self.pdfparse(file_path)
-        print header_indexies, footer_indexies
+            self.InsertPage(2, self.pdfid_textctrl, "pdfid")
+            self.InsertPage(3, self.pdf_parse_textctrl, "pdf-parse")
+            self.display_pdfid(file_path)
+            self.display_pdfparse(file_path)
 
     def load_strings(self, file_path):
         for s in strings(file_path):
@@ -40,7 +42,11 @@ class DetailWindow(wx.Notebook):
         for key in footer_indexies.keys():
             self.signature_textctrl.AppendText(key + ': ' + str(len(footer_indexies[key])) + 'signature\n')
 
-    def pdfparse(self, file_path):
+    def display_pdfid(self, file_path):
+        result = subprocess.check_output(['python', 'pdfid_v0_2_1/pdfid.py', file_path])
+        self.pdfid_textctrl.AppendText(result)
+
+    def display_pdfparse(self, file_path):
         result = subprocess.check_output(['python', 'pdf-parser.py', file_path])
         if 'JavaScript' in result:
             ui_parts.message_box('This PDF include JavaScript code.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
