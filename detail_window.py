@@ -5,7 +5,7 @@ import wx
 import string
 import subprocess
 import ui_parts
-#import pdfid_v0_2_1.pdfid as pdfidlib
+import pdfid_v0_2_1.pdfid as pdfidlib
 
 
 class DetailWindow(wx.Notebook):
@@ -43,8 +43,8 @@ class DetailWindow(wx.Notebook):
             self.signature_textctrl.AppendText(key + ': ' + str(len(footer_indexies[key])) + 'signature\n')
 
     def display_pdfid(self, file_path):
-        result = subprocess.check_output(['python', 'pdfid_v0_2_1/pdfid.py', file_path])
-        self.pdfid_textctrl.AppendText(result)
+        pdfid = get_pdfid_value(file_path)
+        self.pdfid_textctrl.AppendText(pdfid)
 
     def display_pdfparse(self, file_path):
         result = subprocess.check_output(['python', 'pdf-parser.py', '--filter', '--raw', file_path])
@@ -55,6 +55,11 @@ class DetailWindow(wx.Notebook):
             ui_parts.message_box('This PDF include JavaScript code.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
         self.pdf_parse_textctrl.AppendText(result[JS_start: JS_end])
+
+
+def get_pdfid_value(filename):
+    xmlDoc = pdfidlib.PDFiD(filename)
+    return pdfidlib.PDFiD2String(xmlDoc, False)
 
 
 def strings(filename, min=4):
