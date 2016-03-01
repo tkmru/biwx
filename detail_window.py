@@ -54,7 +54,7 @@ class DetailWindow(wx.Notebook):
         if 'JavaScript' in result:
             ui_parts.message_box('This PDF include JavaScript code.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
-        self.pdf_parse_textctrl.AppendText(result[JS_start: JS_end])
+        self.pdf_parse_textctrl.AppendText(result[JS_start: JS_end].replace('>>', '>>\n').replace('\\r', '\n').replace('\\', ''))
 
 
 def get_pdfid_value(filename):
