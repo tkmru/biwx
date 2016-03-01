@@ -59,7 +59,12 @@ class DetailWindow(wx.Notebook):
 
 def get_pdfid_value(filename):
     xmlDoc = pdfidlib.PDFiD(filename)
-    return pdfidlib.PDFiD2String(xmlDoc, False)
+    header = 'PDF Header: {0}\n'.format(xmlDoc.documentElement.getAttribute('Header'))
+    pdfid = ''
+    for node in xmlDoc.documentElement.getElementsByTagName('Keywords')[0].childNodes:
+        pdfid += '{0:<10}{1: 5d}\n'.format(node.getAttribute('Name'), int(node.getAttribute('Count')))
+
+    return header + pdfid
 
 
 def strings(filename, min=4):
