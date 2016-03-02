@@ -14,7 +14,7 @@ class DetailWindow(wx.Notebook):
 
         self.signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
         self.strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
-        self.pdfid_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
+        self.pdfid_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE | wx.TE_RICH2)
         self.pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
 
         self.InsertPage(0, self.signature_textctrl, "signature")
@@ -43,8 +43,10 @@ class DetailWindow(wx.Notebook):
             self.signature_textctrl.AppendText(key + ': ' + str(len(footer_indexies[key])) + 'signature\n')
 
     def display_pdfid(self, file_path):
-        pdfid = get_pdfid_value(file_path)
-        self.pdfid_textctrl.AppendText(pdfid)
+        for i, pdfid in enumerate(get_pdfid_value(file_path)):
+            self.pdfid_textctrl.AppendText(pdfid)
+            if pdfid.startswith('/JS') or pdfid.startswith('/JavaScript') or pdfid.startswith('/ObjStm'):
+                self.pdfid_textctrl.SetStyle(21*(i-1), 21*i, wx.TextAttr("RED", "White"))
 
     def display_pdfparse(self, file_path):
         result = subprocess.check_output(['python', 'pdf-parser.py', '--filter', '--raw', file_path])
@@ -60,11 +62,9 @@ class DetailWindow(wx.Notebook):
 def get_pdfid_value(filename):
     xmlDoc = pdfidlib.PDFiD(filename)
     header = 'PDF Header: {0}\n'.format(xmlDoc.documentElement.getAttribute('Header'))
-    pdfid = ''
+    yield header
     for node in xmlDoc.documentElement.getElementsByTagName('Keywords')[0].childNodes:
-        pdfid += '{0:<10}{1: 5d}\n'.format(node.getAttribute('Name'), int(node.getAttribute('Count')))
-
-    return header + pdfid
+        yield '{0: <15}{1: 5d}\n'.format(node.getAttribute('Name'), int(node.getAttribute('Count')))
 
 
 def strings(filename, min=4):
