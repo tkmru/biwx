@@ -8,6 +8,7 @@ import editor
 import detail_window
 import fy
 import sys
+import os
 # from multiprocessing import Process
 
 BACKGROUND_COLOUR = '#e8e8e8'
@@ -72,9 +73,10 @@ class MainWindow(wx.Frame):
             pass
 
     def extract_files(self, event):
-        target_path = self.editor.resource.file_path
-        if target_path is not None:
-            extract_files = fy.extract(target_path, 'result')
+        source_path = self.editor.resource.file_path
+        if source_path is not None:
+            target_path = os.path.split(source_path)[0] + '/result'
+            extract_files = fy.extract(source_path, target_path)
 
             # create message on dialog
             result = ''
