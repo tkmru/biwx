@@ -21,7 +21,8 @@ class DetailWindow(wx.Notebook):
         self.InsertPage(1, self.strings_textctrl, "strings")
 
     def load_file(self, file_path, header_indexies, footer_indexies):
-        self.load_strings(file_path)
+        self.clear_window()
+        self.display_strings(file_path)
         self.display_signature(header_indexies, footer_indexies)
         if 'pdf' in file_path:
             self.InsertPage(2, self.pdfid_textctrl, "pdfid")
@@ -29,7 +30,13 @@ class DetailWindow(wx.Notebook):
             self.display_pdfid(file_path)
             self.display_pdfparse(file_path)
 
-    def load_strings(self, file_path):
+    def clear_window(self):
+        self.signature_textctrl.Clear()
+        self.strings_textctrl.Clear()
+        self.pdfid_textctrl.Clear()
+        self.pdf_parse_textctrl.Clear()
+
+    def display_strings(self, file_path):
         for s in strings(file_path):
             self.strings_textctrl.AppendText(s)
 
