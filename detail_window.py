@@ -30,7 +30,7 @@ class DetailWindow(wx.Notebook):
 
     def load_file(self, file_path, header_indexies, footer_indexies):
         self.clear_window()
-        self.display_strings(file_path)
+        self.start_display_strings(file_path)
         self.display_signature(header_indexies, footer_indexies)
         if 'pdf' in file_path:
             self.InsertPage(2, self.pdfid_textctrl, "pdfid")
@@ -43,6 +43,10 @@ class DetailWindow(wx.Notebook):
         self.strings_textctrl.Clear()
         self.pdfid_textctrl.Clear()
         self.pdf_parse_textctrl.Clear()
+
+    def start_display_strings(self, file_path):
+        p = Process(target=self.display_strings, args=(file_path,))
+        p.start()
 
     def display_strings(self, file_path):
         for s in strings(file_path):
