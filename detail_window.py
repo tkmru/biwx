@@ -6,19 +6,27 @@ import string
 import subprocess
 import ui_parts
 import pdfid_v0_2_1.pdfid as pdfidlib
+from multiprocessing import Queue, Process
 
 
 class DetailWindow(wx.Notebook):
-    def __init__(self, *args, **kwags):
-        wx.Notebook.__init__(self, *args, **kwags)
+    def __init__(self, *args, **kwargs):
+        wx.Notebook.__init__(self, *args, **kwargs)
 
         self.signature_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
+        self.strings_queue = Queue()
         self.strings_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
         self.pdfid_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE | wx.TE_RICH2)
         self.pdf_parse_textctrl = wx.TextCtrl(self, -1, style=wx.TE_READONLY | wx.TE_MULTILINE)
 
+        self.Bind(wx.EVT_IDLE, self.on_idle)
+
         self.InsertPage(0, self.signature_textctrl, "signature")
         self.InsertPage(1, self.strings_textctrl, "strings")
+
+    def on_idle(self, event):
+        if not self.strings_queue.empty():
+            self.strings_textctrl.AppendText(self.strings_queue.get() + '\n')
 
     def load_file(self, file_path, header_indexies, footer_indexies):
         self.clear_window()
@@ -38,7 +46,7 @@ class DetailWindow(wx.Notebook):
 
     def display_strings(self, file_path):
         for s in strings(file_path):
-            self.strings_textctrl.AppendText(s)
+            self.strings_queue.put(s)
 
     def display_signature(self, header_indexies, footer_indexies):
         self.signature_textctrl.AppendText('HEADER\n')

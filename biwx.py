@@ -9,7 +9,6 @@ import detail_window
 import fy
 import sys
 import os
-# from multiprocessing import Process
 
 BACKGROUND_COLOUR = '#e8e8e8'
 
@@ -50,6 +49,7 @@ class MainWindow(wx.Frame):
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.detail_window = detail_window.DetailWindow(self)
+        self.strings_queue = self.detail_window.strings_queue
         sizer.Add(self.detail_window, proportion=1, flag=wx.EXPAND)
         self.editor = editor.Editor(self)
         sizer.Add(self.editor, proportion=1, flag=wx.EXPAND)
