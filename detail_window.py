@@ -26,7 +26,7 @@ class DetailWindow(wx.Notebook):
 
     def on_idle(self, event):
         if not self.strings_queue.empty():
-            self.strings_textctrl.AppendText(self.strings_queue.get() + '\n')
+            self.strings_textctrl.WriteText(self.strings_queue.get() + '\n')
 
     def load_file(self, file_path, header_indexies, footer_indexies):
         self.clear_window()
@@ -65,7 +65,7 @@ class DetailWindow(wx.Notebook):
         for i, pdfid in enumerate(get_pdfid_value(file_path)):
             self.pdfid_textctrl.AppendText(pdfid)
             if pdfid.startswith('/JS') or pdfid.startswith('/JavaScript') or pdfid.startswith('/ObjStm'):
-                self.pdfid_textctrl.SetStyle(21*(i-1), 21*i, wx.TextAttr("RED", "White"))
+                self.pdfid_textctrl.SetStyle(21*(i), 21*(i+1), wx.TextAttr("RED", "White"))
 
     def display_pdfparse(self, file_path):
         result = subprocess.check_output(['python', 'pdf-parser.py', '--filter', '--raw', file_path])
