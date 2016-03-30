@@ -21,6 +21,7 @@ class MainWindow(wx.Frame):
         self.CreateStatusBar() # a Statusbar in the bottom of the window
         ID_AUTO_EXTRACT = wx.NewId()
         ID_EXTRACT_FROM_PDF = wx.NewId()
+        ID_OPEN_SHELLCODE = wx.NewId()
 
         # creating the menubar.
         menu_bar = wx.MenuBar()
@@ -32,8 +33,10 @@ class MainWindow(wx.Frame):
         file_menu.Append(wx.ID_EXIT, '&Exit', 'Terminate the program')
         file_menu.Append(wx.ID_NEW, '&New Window', 'Open new window')
         file_menu.Append(wx.ID_OPEN, '&Open', 'Open file')
+        file_menu.Append(ID_OPEN_SHELLCODE, '&Open shellcode', 'Open shellcode')
         file_menu.Append(wx.ID_SAVE, '&Save', 'Save current binary')
         self.Connect(wx.ID_OPEN, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
+        self.Connect(ID_OPEN_SHELLCODE, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.open_file_dialog)
         self.Connect(wx.ID_SAVE, -1, wx.wxEVT_COMMAND_MENU_SELECTED, self.save_file)
         menu_bar.Append(file_menu, '&File')
 
