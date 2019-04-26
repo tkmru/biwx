@@ -1,39 +1,18 @@
-====
-biwx
-====
+# biwx
 
-| 'biwx' is binary editer on cross platform. This is still develop version.
+'biwx' is binary editer on cross platform. This is still develop version.
 
+## How to use
 
+```
+  $ python biwx.py
+```
 
-How to use
-==========
+## Screenshot
 
-    $ python biwx.py
+![image](./screenshot.png)
 
-
-Screenshot
-==========
-
-.. image:: ./screenshot.png
-
-..
-  Installation
-  ============
-
-  ----
-  PyPI
-  ----
-  The recommended process is to install the PyPI package, as it allows easily staying update.
-
-
-
-     $ pip install biwx
-
-
-License
-=======
-
+## License
 MIT License
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

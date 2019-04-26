@@ -11,9 +11,6 @@ if not os.path.exists('scripts'):
     os.makedirs('scripts')
 shutil.copyfile('biwx.py', 'scripts/biwx')
 
-with open('README.rst', 'r') as f:
-    readme_file = f.read()
-
 setup(
     name='biwx',
     version=biwx.__version__,
@@ -24,7 +21,8 @@ setup(
     license=biwx.__license__,
     keywords=['binary', 'hex'],
     description=biwx.__description__,
-    long_description=readme_file,
+    long_description=open('README.md').read(),
+    long_description_content_type=”text/markdown”,
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
