@@ -5,7 +5,7 @@ import wx
 import string
 import subprocess
 import ui_parts
-import pdfid_v0_2_1.pdfid as pdfidlib
+import pdfid_v0_2_5.pdfid as pdfidlib
 from multiprocessing import Queue, Process
 
 

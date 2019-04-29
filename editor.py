@@ -132,14 +132,14 @@ class Editor(wx.Panel):
         event.Skip()
 
     def on_mouse_over(self, event):
-        print 'mouse over'
+        print('mouse over')
         event.Skip()
 
     def on_cell_changed(self, event):
         self.hex_grid.ForceRefresh() # for being reflected edited data
         self.dump_grid.ForceRefresh() # for being reflected edited data
 
-        print 'changed'
+        print('changed')
         event.Skip()
 
     def on_cell_selected(self, event):
@@ -164,7 +164,6 @@ class Editor(wx.Panel):
 
             self.hex_grid.ForceRefresh() # for being reflected edited data
             self.dump_grid.ForceRefresh() # for being reflected edited data
-            print 'selected' + hex(selected_col+16*selected_row)
 
         event.Skip()
 
@@ -243,6 +242,6 @@ class Editor(wx.Panel):
             if fy.check_hidden_data(self.resource.binary, header_indexies, footer_indexies):
                 ui_parts.message_box('This file include hidden file.', 'Hidden File Alert', wx.OK | wx.ICON_ERROR)
 
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             ui_parts.message_box('Can not open file {0}.'.format(self.resource.file_path), 'Load File Error', wx.OK | wx.ICON_ERROR)
